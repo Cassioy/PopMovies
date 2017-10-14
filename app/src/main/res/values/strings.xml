@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Popular Movies Stage 2</string>
+    <string name="default_text">Try to do yourself</string>
+    <string name="default_text_2">To Be Delivered</string>
+    <string name="plot_title">Plot Synopsis</string>
+    <string name="release_date_title">Release Date</string>
+    <string name="movie_info">Movie Information</string>
+    <string name="vote_average">Rating</string>
+    <string name="action_settings">Settings</string>
+    <string name="LANGUAGE">en-US</string>
+    <string name="PAGE">1</string>
+    <string-array name="spinner_items">
+        <item>Sort By</item>
+        <item>Popular</item>
+        <item>Top Rated</item>
+        <item>Favourites</item>
+    </string-array>
+</resources>
