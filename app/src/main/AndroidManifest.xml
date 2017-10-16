@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+    <uses-permission android:name="cassioyoshi.android.com.popmoviesstage2.MOVIES_READ"></uses-permission>
+    <uses-permission android:name="cassioyoshi.android.com.popmoviesstage2.provider"></uses-permission>
+
 
     <application
         android:allowBackup="true"
@@ -12,9 +15,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <meta-data android:name="com.codewaves.youtubethumbnailview.ApiKey"
-                   android:value="AIzaSyBmVSEWmBLcSj_y1ikMtz6YjB3HAAYTWDk" />
 
         <activity android:name="cassioyoshi.android.com.popmoviesstage2.PopMoviesMainActivity"
                   android:configChanges="orientation|screenSize|keyboardHidden">
@@ -31,6 +31,13 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name=".data.MovieProvider"
+            android:authorities="cassioyoshi.android.com.popmoviesstage2"
+            android:exported="false"
+            android:protectionLevel="signature"
+            android:syncable="true"/>
     </application>
 
 </manifest>

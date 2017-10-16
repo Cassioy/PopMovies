@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -45,10 +44,6 @@ public class PopMoviesAdapter extends RecyclerView.Adapter<PopMoviesAdapter.View
         }
     }
 
-
-
-
-
     @Override
     public Viewholder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(
@@ -60,7 +55,7 @@ public class PopMoviesAdapter extends RecyclerView.Adapter<PopMoviesAdapter.View
     @Override
     public void onBindViewHolder(Viewholder holder, final int position) {
 
-        URL url = mPopMoviesList.get(position).getPosterSource();
+        String url = mPopMoviesList.get(position).getPosterSource();
         Picasso.with(mContext).load(url.toString()).into(holder.iconView);
         holder.iconView.setOnClickListener( new View.OnClickListener() {
             @Override

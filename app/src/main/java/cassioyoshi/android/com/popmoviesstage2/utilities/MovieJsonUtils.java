@@ -8,7 +8,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 import cassioyoshi.android.com.popmoviesstage2.PopMovies;
@@ -74,8 +73,8 @@ public class MovieJsonUtils {
             String release_date = movieJsonObject.getString(RELEASE_DATE);
             String m_id = movieJsonObject.getString(MOVIE_ID);
 
-            URL buildImage = NetworkUtils.buildImageUrl(poster_image);
-            URL buildBackdrop = NetworkUtils.buildImageUrl(backdrop_image);
+            String buildImage = NetworkUtils.buildImageUrl(poster_image);
+            String buildBackdrop = NetworkUtils.buildImageUrl(backdrop_image);
 
             Log.v("MONTANDO O JSON", "VERIFICANDO O ID " + m_id);
 

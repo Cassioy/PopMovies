@@ -8,6 +8,7 @@
     android:stretchMode="columnWidth"
     tools:context="cassioyoshi.android.com.popmoviesstage2.PopMoviesFragment"
     android:id="@+id/movies_grid"
-    android:adjustViewBounds="true">
+    android:adjustViewBounds="true"
+    android:background="@color/colorWhite">
 
 </android.support.v7.widget.RecyclerView>

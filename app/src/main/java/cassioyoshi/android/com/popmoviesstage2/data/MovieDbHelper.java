@@ -23,14 +23,13 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieContract.MovieEntry.TABLE_NAME + " (" +
                 MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                MovieContract.MovieEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_PLOT_SYNOPSIS + " TEXT NOT NULL" +
-                MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL" +
-                MovieContract.MovieEntry.COLUMN_VOTE_AVG + "TEXT NOT NULL" +
-                MovieContract.MovieEntry.COLUMN_PLOT_SYNOPSIS + " TEXT NOT NULL" +
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_POSTER_IMAGE + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_BACKDROP_IMAGE + " TEXT NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL," +
+                MovieContract.MovieEntry.COLUMN_PLOT_SYNOPSIS + " TEXT NOT NULL," +
+                MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
+                MovieContract.MovieEntry.COLUMN_VOTE_AVG + "TEXT NOT NULL," +
+                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
+                MovieContract.MovieEntry.COLUMN_POSTER_IMAGE + " TEXT NOT NULL," +
+                MovieContract.MovieEntry.COLUMN_BACKDROP_IMAGE + " TEXT NOT NULL" +
                 "); ";
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
 

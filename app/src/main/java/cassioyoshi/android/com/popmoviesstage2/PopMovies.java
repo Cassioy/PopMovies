@@ -11,8 +11,8 @@ import java.net.URL;
 
 public class PopMovies implements Parcelable{
 
-    URL posterSource;
-    URL backdropSource;
+    String posterSource;
+    String backdropSource;
 
     String mTitle;
     String mReleaseDate;
@@ -21,7 +21,7 @@ public class PopMovies implements Parcelable{
     String mId;
 
 
-    public PopMovies(URL posterImage, URL backdropImage, String title, String overview, String voteAvg, String releaseDate, String id) {
+    public PopMovies(String posterImage, String backdropImage, String title, String overview, String voteAvg, String releaseDate, String id) {
         this.posterSource = posterImage;
         this.backdropSource = backdropImage;
         this.mTitle = title;
@@ -72,7 +72,7 @@ public class PopMovies implements Parcelable{
         }
     };
 
-    public URL getPosterSource() {
+    public String getPosterSource() {
         return posterSource;
     }
 
