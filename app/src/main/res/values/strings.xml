@@ -9,6 +9,7 @@
     <string name="movie_info">Movie Information</string>
     <string name="vote_average">Rating</string>
     <string name="no_internet">Please Check your Internet Connection!</string>
+    <string name="no_trailer">No Trailer Available...</string>
     <string name="button_retry">RETRY</string>
 
 

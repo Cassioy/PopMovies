@@ -4,7 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -45,7 +49,7 @@ import static cassioyoshi.android.com.popmoviesstage2.data.MovieContract.MovieEn
 
 public class PopMoviesDetails extends AppCompatActivity {
 
-    private RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerViewTrailer;
     private RecyclerView.Adapter mAdapter;
     private List<Result> trailersList;
     private List<ReviewList> reviewDescription;
@@ -53,6 +57,8 @@ public class PopMoviesDetails extends AppCompatActivity {
     private String totalReviews;
     private int id;
     private PopMovies favMovie;
+    private TextView noTrailer;
+    private TextView noInternet;
 
     private Cursor cursor;
 
@@ -79,9 +85,9 @@ public class PopMoviesDetails extends AppCompatActivity {
 
             favMovie = new PopMovies( thumbnailUrl, imageUrl, title, synopsis, votes, released, video_id );
 
-
-
         Log.v( "verificando id", " " + id);
+            mRecyclerViewTrailer = (RecyclerView) findViewById( R.id.horizontal_recycler_view );
+
 
 // language is set to en-US and page is set to 1, API_KEY is found on config.xml resource not included in this project
 
@@ -114,7 +120,6 @@ public class PopMoviesDetails extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<ReviewData> callReview, Throwable t) {
                     Log.e("onFailure", "Requisicao detalhes falhou... ");
-
                 }
             });
 
@@ -135,11 +140,10 @@ public class PopMoviesDetails extends AppCompatActivity {
 
                         mAdapter = new TrailerAdapter(mContext, trailersList);
 
-                        mRecyclerView = (RecyclerView) findViewById( R.id.horizontal_recycler_view );
-                        mRecyclerView.setHasFixedSize( true );
+                        mRecyclerViewTrailer.setHasFixedSize( true );
 
-                        mRecyclerView.setLayoutManager(linearLayoutManager);
-                        mRecyclerView.setAdapter(mAdapter);
+                        mRecyclerViewTrailer.setLayoutManager(linearLayoutManager);
+                        mRecyclerViewTrailer.setAdapter(mAdapter);
 
                     }catch (Exception e){
                         Log.e("onFailure", "Requisicao detalhes vazia...");
@@ -150,11 +154,25 @@ public class PopMoviesDetails extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<Video> call, Throwable t) {
                     Log.e("onFailure", "Requisicao detalhes falhou... ");
+                    if(isInternetOn()) {
 
+                    }else{
+
+                        Handler mainHandler = new Handler( Looper.getMainLooper());
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                // code to interact with UI
+                                mRecyclerViewTrailer.setVisibility( View.GONE );
+                                noInternet = (TextView) findViewById( R.id.verify_internet );
+                                noTrailer = (TextView) findViewById( R.id.no_trailer );
+                                noInternet.setVisibility( View.VISIBLE );
+                                noTrailer.setVisibility( View.VISIBLE );
+                            }
+                        });
+                    }
                 }
             });
-
-
 
             final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -186,7 +204,6 @@ public class PopMoviesDetails extends AppCompatActivity {
 
             TextView overview = (TextView) findViewById( plot_synopsis);
             overview.setText(synopsis);
-
 
             TextView releaseDate = (TextView) findViewById( release_date);
             releaseDate.setText(released);
@@ -235,7 +252,7 @@ public class PopMoviesDetails extends AppCompatActivity {
 
 
         private void loadBackdrop(String url) {
-            final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
+            ImageView imageView = (ImageView) findViewById(R.id.backdrop);
             Picasso.with(this).load(url).into(imageView);
 
         }
@@ -338,6 +355,19 @@ public class PopMoviesDetails extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    public final boolean isInternetOn() {
+
+        // get Connectivity Manager object to check connection
+        ConnectivityManager connec =
+                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE );
+
+        NetworkInfo activeNetwork = connec.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        return isConnected;
     }
 }
 

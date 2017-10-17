@@ -3,8 +3,6 @@ package cassioyoshi.android.com.popmoviesstage2;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -116,19 +114,6 @@ public class PopMoviesMainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frag_parent, fragment);
         fragmentTransaction.commit();
 
-    }
-
-    public final boolean isInternetOn() {
-
-        // get Connectivity Manager object to check connection
-        ConnectivityManager connec =
-                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE );
-
-        NetworkInfo activeNetwork = connec.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
-
-        return isConnected;
     }
 
 }

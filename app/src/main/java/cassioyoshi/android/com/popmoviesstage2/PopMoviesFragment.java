@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -151,12 +152,15 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
 
                     }else{
                         mRecyclerView.setVisibility( View.GONE );
+                        mRecyclerView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorWhite) );
                         mNodata.setVisibility( View.VISIBLE );
                         mRetry.setVisibility( View.VISIBLE );
                         mRetry.setOnClickListener( new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-
+                                Intent i = new Intent( getActivity(), PopMoviesMainActivity.class );
+                                mRecyclerView.setBackgroundColor(0);
+                                startActivity( i );
                             }
                         } );
 
@@ -239,12 +243,14 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onPause() {
         super.onPause();
+        mDb.close();
 
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        mDb.close();
     }
 
     public final boolean isInternetOn() {
