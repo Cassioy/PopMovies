@@ -4,6 +4,8 @@ import cassioyoshi.android.com.popmoviesstage2.services.PopMoviesService;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+
+
 /**
  * Created by cassioimamura on 8/30/17.
  */
@@ -15,7 +17,7 @@ public class RetrofitStart {
     public RetrofitStart(){
 
         retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.themoviedb.org/3/movie/" )
+                .baseUrl("https://api.themoviedb.org/3/movie/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
@@ -24,4 +26,5 @@ public class RetrofitStart {
             return retrofit.create(PopMoviesService.class);
 
     }
+
 }

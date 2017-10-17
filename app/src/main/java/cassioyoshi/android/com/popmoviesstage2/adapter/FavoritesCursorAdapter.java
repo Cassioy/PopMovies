@@ -1,9 +1,8 @@
-package cassioyoshi.android.com.popmoviesstage2;
+package cassioyoshi.android.com.popmoviesstage2.adapter;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +11,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
+
+import cassioyoshi.android.com.popmoviesstage2.PopMoviesDetails;
+import cassioyoshi.android.com.popmoviesstage2.PopMoviesFragment;
+import cassioyoshi.android.com.popmoviesstage2.R;
 
 /**
  * Created by cassioimamura on 10/15/17.
@@ -25,8 +28,6 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
 
     private FavoritesCursorAdapterViewHolder holder;
 
-    private FavoritesAdapterOnClickHandler mClickHandler;
-
 
     class FavoritesCursorAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
@@ -36,7 +37,7 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
         FavoritesCursorAdapterViewHolder(View view, Context context) {
             super(view);
 
-            favThumbView = (ImageView) itemView.findViewById(R.id.favorite_thumbnail);
+            favThumbView = (ImageView) itemView.findViewById( R.id.favorite_thumbnail);
             view.setOnClickListener(this);
 
         }
@@ -68,19 +69,6 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
         }
     }
 
-    public interface FavoritesAdapterOnClickHandler {
-        void onClick(View v);
-    }
-
-
-    public FavoritesCursorAdapter(@NonNull Context context, FavoritesAdapterOnClickHandler clickHandler) {
-        mContext = context;
-        mClickHandler = clickHandler;
-    }
-
-
-
-
     public FavoritesCursorAdapter(Context context, Cursor cursor){
         mContext = context;
         mCursor = cursor;
@@ -97,7 +85,7 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
         return holder;    }
 
     @Override
-    public void onBindViewHolder(FavoritesCursorAdapterViewHolder holder, int position) {
+    public void onBindViewHolder(final FavoritesCursorAdapterViewHolder holder, int position) {
         mCursor.moveToPosition(position);
 
         final String posterImage;
@@ -128,7 +116,7 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
     }
 
 
-    void swapCursor(Cursor newCursor) {
+    public void swapCursor(Cursor newCursor) {
         mCursor = newCursor;
         notifyDataSetChanged();
     }

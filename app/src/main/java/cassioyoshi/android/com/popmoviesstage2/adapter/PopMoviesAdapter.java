@@ -1,4 +1,4 @@
-package cassioyoshi.android.com.popmoviesstage2;
+package cassioyoshi.android.com.popmoviesstage2.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,10 @@ import com.squareup.picasso.Picasso;
 import java.io.Serializable;
 import java.util.List;
 
+import cassioyoshi.android.com.popmoviesstage2.PopMovies;
+import cassioyoshi.android.com.popmoviesstage2.PopMoviesDetails;
+import cassioyoshi.android.com.popmoviesstage2.R;
+
 /**
  * Created by cassioimamura on 2/4/17.
  */
@@ -21,9 +25,10 @@ public class PopMoviesAdapter extends RecyclerView.Adapter<PopMoviesAdapter.View
 
     private static final String LOG_TAG = PopMoviesAdapter.class.getSimpleName();
     private static Context mContext;
-    private List<PopMovies> mPopMoviesList;
+    public List<PopMovies> mPopMoviesList;
 
-
+    private static final int VIEW_TYPE_DATA = 1;
+    private static final int VIEW_TYPE_EMPTY = 2;
 
     /** This is a custom constructor **/
 
@@ -40,7 +45,7 @@ public class PopMoviesAdapter extends RecyclerView.Adapter<PopMoviesAdapter.View
 
         public Viewholder(View itemView) {
             super( itemView );
-             iconView = (ImageView) itemView.findViewById(R.id.thumbnail_image);
+             iconView = (ImageView) itemView.findViewById( R.id.thumbnail_image);
         }
     }
 

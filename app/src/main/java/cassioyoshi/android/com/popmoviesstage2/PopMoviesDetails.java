@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +23,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import cassioyoshi.android.com.popmoviesstage2.adapter.TrailerAdapter;
 import cassioyoshi.android.com.popmoviesstage2.data.MovieContract;
 import cassioyoshi.android.com.popmoviesstage2.data.model.Result;
 import cassioyoshi.android.com.popmoviesstage2.data.model.ReviewData;
@@ -34,7 +36,6 @@ import retrofit2.Response;
 
 import static cassioyoshi.android.com.popmoviesstage2.R.id.plot_synopsis;
 import static cassioyoshi.android.com.popmoviesstage2.R.id.release_date;
-import static cassioyoshi.android.com.popmoviesstage2.data.MovieContract.MovieEntry.COLUMN_MOVIE_ID;
 import static cassioyoshi.android.com.popmoviesstage2.data.MovieContract.MovieEntry.CONTENT_URI;
 
 
@@ -53,6 +54,8 @@ public class PopMoviesDetails extends AppCompatActivity {
     private int id;
     private PopMovies favMovie;
 
+    private Cursor cursor;
+
 
     public LinearLayoutManager linearLayoutManager
             = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -65,8 +68,8 @@ public class PopMoviesDetails extends AppCompatActivity {
 
         overridePendingTransition(R.anim.trans_right_in, R.anim.trans_right_out);
 
-            String imageUrl = (String) getIntent().getSerializableExtra("backdropImage");
             String thumbnailUrl = (String) getIntent().getSerializableExtra("posterImage");
+            String imageUrl = (String) getIntent().getSerializableExtra("backdropImage");
             String title = (String) getIntent().getSerializableExtra("title");
             String synopsis = (String) getIntent().getSerializableExtra("plotSynopsis");
             String released = (String) getIntent().getSerializableExtra( "releaseDate" );
@@ -76,9 +79,11 @@ public class PopMoviesDetails extends AppCompatActivity {
 
             favMovie = new PopMovies( thumbnailUrl, imageUrl, title, synopsis, votes, released, video_id );
 
+
+
         Log.v( "verificando id", " " + id);
 
-// language is set to en-US and page is set to 1, API_KEY is found on config.xml resource
+// language is set to en-US and page is set to 1, API_KEY is found on config.xml resource not included in this project
 
         Call<ReviewData> callReview = new RetrofitStart().getMovie()
                     .requestReviews(id ,getString(R.string.API_KEY), getString( R.string.LANGUAGE ), Integer.parseInt(getString(R.string.PAGE)));
@@ -91,10 +96,7 @@ public class PopMoviesDetails extends AppCompatActivity {
                         ReviewData reviewData = responseReview.body();
                         totalReviews = reviewData.getTotalResults().toString();
 
-                        //Verify on background if favorite using content provider
-
                         Button reviewBtn = (Button) findViewById( R.id.review );
-
 
                         Log.v( "verificando", "Results Review" + statusCode);
                         Log.v( "verificando", "Total Resultados " + totalReviews);
@@ -131,7 +133,7 @@ public class PopMoviesDetails extends AppCompatActivity {
                         Log.v( "VideoObject", "Results " + selectedVideo);
                         Log.v( "List Results", "Results " + trailersList);
 
-                        mAdapter = new VideoAdapter(mContext, trailersList);
+                        mAdapter = new TrailerAdapter(mContext, trailersList);
 
                         mRecyclerView = (RecyclerView) findViewById( R.id.horizontal_recycler_view );
                         mRecyclerView.setHasFixedSize( true );
@@ -162,6 +164,26 @@ public class PopMoviesDetails extends AppCompatActivity {
                     (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
             collapsingToolbar.setTitle(title);
 
+        final ImageButton fab = (ImageButton) findViewById(R.id.fab);
+
+
+
+        ImageView thumb = (ImageView) findViewById( R.id.movie_info_thumbnail );
+        Picasso.with(this).load(thumbnailUrl).into(thumb);
+
+
+        loadBackdrop(imageUrl);
+
+        if (checkDatabase( title ) == true) {
+            fab.setSelected( true );
+            fab.setImageResource(R.drawable.ic_grade_yellow_48px );
+
+        }else{
+            fab.setSelected( false );
+            fab.setImageResource(R.drawable.ic_grade_white_48px);
+        }
+
+
             TextView overview = (TextView) findViewById( plot_synopsis);
             overview.setText(synopsis);
 
@@ -169,9 +191,10 @@ public class PopMoviesDetails extends AppCompatActivity {
             TextView releaseDate = (TextView) findViewById( release_date);
             releaseDate.setText(released);
 
-            Drawable red = getResources().getDrawable(R.drawable.circle_3);
-            Drawable yellow = getResources().getDrawable(R.drawable.circle_2);
-            Drawable green = getResources().getDrawable(R.drawable.circle);
+
+            Drawable red = ContextCompat.getDrawable(getApplicationContext(), R.drawable.circle_3);
+            Drawable yellow = ContextCompat.getDrawable(getApplicationContext(),R.drawable.circle_2);
+            Drawable green = ContextCompat.getDrawable(getApplicationContext(),R.drawable.circle);
 
 
             Button rating = (Button) findViewById( R.id.rating_button );
@@ -190,14 +213,6 @@ public class PopMoviesDetails extends AppCompatActivity {
 //            Acesso a pagina de reviews TBD
 //            Button reviews = (Button) findViewById(R.id.review);
 
-
-            ImageView thumb = (ImageView) findViewById( R.id.movie_info_thumbnail );
-            Picasso.with(this).load(thumbnailUrl).into(thumb);
-
-
-            loadBackdrop(imageUrl);
-
-        final ImageButton fab = (ImageButton) findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -264,17 +279,17 @@ public class PopMoviesDetails extends AppCompatActivity {
         cv.put( MovieContract.MovieEntry.COLUMN_RELEASE_DATE, popmovies.mReleaseDate );
         cv.put( MovieContract.MovieEntry.COLUMN_VOTE_AVG, popmovies.mVoteAvg );
         cv.put( MovieContract.MovieEntry.COLUMN_MOVIE_ID, id);
-        cv.put( MovieContract.MovieEntry.COLUMN_BACKDROP_IMAGE, popmovies.backdropSource.toString() );
-        cv.put( MovieContract.MovieEntry.COLUMN_POSTER_IMAGE, popmovies.posterSource.toString() );
+        cv.put( MovieContract.MovieEntry.COLUMN_BACKDROP_IMAGE, popmovies.backdropSource);
+        cv.put( MovieContract.MovieEntry.COLUMN_POSTER_IMAGE, popmovies.posterSource);
 
-        getApplicationContext().getContentResolver().insert( CONTENT_URI, cv );
+          getApplicationContext().getContentResolver().insert( CONTENT_URI, cv );
 
-        Cursor c = getContentResolver().query(CONTENT_URI, null, COLUMN_MOVIE_ID, null, null);
-        Log.d( "checking cursor", "addFavoriteMovie: " + c.getCount() );
-        if(c.getCount() == 0) {
-            // not found in database
-            Log.d( "no database", "not found on database" );
-        }
+//        Cursor c = getContentResolver().query(CONTENT_URI, null, COLUMN_MOVIE_ID, null, null);
+//        Log.d( "checking cursor", "addFavoriteMovie: " + c.getCount() );
+//        if(c.getCount() == 0) {
+//            // not found in database
+//            Log.d( "no database", "not found on database" );
+//        }
     }
 
     public void removeFavoriteMovie(PopMovies popmovies){
@@ -285,16 +300,45 @@ public class PopMoviesDetails extends AppCompatActivity {
 
         getContentResolver().delete(CONTENT_URI, mSelectionClause, mSelectionArgs);
 
-        Cursor r = getContentResolver().query(CONTENT_URI, null, COLUMN_MOVIE_ID, null, null);
-        Log.d( "checking cursor", "removeFavoriteMovie: " + r.getCount() );
-        if(r.getCount() == 0) {
-            // not found in database
-            Log.d( "no data", "cannot delete" );
-        }
+
+//
+//        Cursor r = getContentResolver().query(CONTENT_URI, null, COLUMN_MOVIE_ID, null, null);
+//        Log.d( "checking cursor", "removeFavoriteMovie: " + r.getCount() );
+//        if(r.getCount() == 0) {
+//            // not found in database
+//            Log.d( "no data", "cannot delete" );
+//        }
 
     }
 
+    //Check if movie title already exists in database
+    public Boolean checkDatabase(String movieTitle){
+        boolean d;
+        String mCheckTitle = MovieContract.MovieEntry.COLUMN_MOVIE_TITLE + " LIKE ?";
+        String[] checkTitleArgs = {movieTitle};
 
+        Cursor c = getContentResolver().query( CONTENT_URI, null, mCheckTitle, checkTitleArgs, null );
+
+        if(c.getCount() > 0) {
+            d = true;
+            c.close();
+        }else{
+            d = false;
+            c.close();
+        }
+
+        return d;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
 
 

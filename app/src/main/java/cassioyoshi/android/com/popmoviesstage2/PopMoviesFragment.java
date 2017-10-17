@@ -8,6 +8,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -17,13 +18,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 
 import java.util.List;
 
+import cassioyoshi.android.com.popmoviesstage2.adapter.FavoritesCursorAdapter;
+import cassioyoshi.android.com.popmoviesstage2.adapter.PopMoviesAdapter;
 import cassioyoshi.android.com.popmoviesstage2.data.MovieContract;
 import cassioyoshi.android.com.popmoviesstage2.data.MovieDbHelper;
 import cassioyoshi.android.com.popmoviesstage2.retrofit.RetrofitStart;
@@ -32,7 +36,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static cassioyoshi.android.com.popmoviesstage2.data.MovieContract.MovieEntry.COLUMN_MOVIE_ID;
+import static android.content.Context.CONNECTIVITY_SERVICE;
 import static cassioyoshi.android.com.popmoviesstage2.data.MovieContract.MovieEntry.CONTENT_URI;
 
 /**
@@ -47,6 +51,8 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     private FavoritesCursorAdapter favoritesCursorAdapter;
     private List<PopMovies> moviesArrayList;
     private RecyclerView mRecyclerView;
+    private TextView mNodata;
+    private Button mRetry;
     private String category_chooser;
     public String jsonmovies;
     public SQLiteDatabase mDb;
@@ -62,8 +68,6 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_BACKDROP_IMAGE,
             MovieContract.MovieEntry.COLUMN_POSTER_IMAGE
-
-
     };
 
     public static final int INDEX_ID = 0;
@@ -80,7 +84,6 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
 
     public static String temp;
     public Context mContext;
-    private Cursor m;
     public GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
 
 
@@ -92,20 +95,25 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate( R.layout.fragment_main, container, false );
+        final View rootView = inflater.inflate( R.layout.fragment_main, container, false );
 
-        if (temp == null) {
-            category_chooser = "popular";
-        }
-        if (temp == "top_rated") {
-            category_chooser = temp;
-        }
-        if (temp == "popular") {
-            category_chooser = temp;
-        }
+            if (temp == null) {
+                category_chooser = "popular";
+            }
+            if (temp == "top_rated") {
+                category_chooser = temp;
+            }
+            if (temp == "popular") {
+                category_chooser = temp;
+            }
 
-        mContext = rootView.getContext();
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_grid);
+            mContext = rootView.getContext();
+            mRecyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_main_recycler);
+            mNodata = (TextView) rootView.findViewById( R.id.nointernet );
+            mRetry = (Button) rootView.findViewById( R.id.retry_btn );
+            MovieDbHelper movieDbHelper = new MovieDbHelper( mContext );
+            mDb = movieDbHelper.getWritableDatabase();
+
 
         if(category_chooser == "popular" || category_chooser == "top_rated") {
 
@@ -123,18 +131,15 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
                         isInternetOn();
                         JsonObject ob = response.body();
                         jsonmovies = ob.toString();
-                        Log.d( "Json formado", jsonmovies );
+                        //Log.d( "Json formado", jsonmovies );
                         moviesArrayList = MovieJsonUtils.getSimpleMovieStringsFromJson(mContext, jsonmovies);
                         adapter = new PopMoviesAdapter( mContext, moviesArrayList );
                         mRecyclerView.setHasFixedSize( true );
                         mRecyclerView.setLayoutManager( gridLayoutManager);
                         mRecyclerView.setAdapter( adapter );
-                        hideProgressBar();
 
                     }catch (Exception e){
                         Log.e("onFailure", "Requisicao vazia...");
-                        isInternetOn();
-                        hideProgressBar();
 
                     }
                 }
@@ -142,80 +147,46 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Log.e("onFailure", "Requisicao falhou...");
-                    isInternetOn();
+                    if(isInternetOn()){
+
+                    }else{
+                        mRecyclerView.setVisibility( View.GONE );
+                        mNodata.setVisibility( View.VISIBLE );
+                        mRetry.setVisibility( View.VISIBLE );
+                        mRetry.setOnClickListener( new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                            }
+                        } );
+
+                    }
 
                 }
             });
 
 
-        }else {
+        }else{
 
-            MovieDbHelper movieDbHelper = new MovieDbHelper( mContext );
-            mDb = movieDbHelper.getWritableDatabase();
             getLoaderManager().initLoader(ID_FAVORITES_LOADER, null, this);
-            getAllMovies();
-
-            favoritesCursorAdapter = new FavoritesCursorAdapter( mContext, m );
 
             mRecyclerView.setHasFixedSize( true );
             mRecyclerView.setLayoutManager( gridLayoutManager);
 
-            //clean Picasso Cache for Favorites
+            //make white background for Favorites screen
             mRecyclerView.setBackgroundColor( ContextCompat.getColor(mContext, R.color.colorWhite) );
 
-            mRecyclerView.setAdapter( favoritesCursorAdapter );
-            hideProgressBar();
-
-
         }
-
-
-
         return rootView;
-
     }
 
     public void hideProgressBar() {
 
         ProgressBar progress = (ProgressBar) getActivity().findViewById( R.id.progressBarFetch );
-        progress.setVisibility( View.GONE );
-
-    }
-
-
-    public void getTemp(String t) {
-        temp = t;
-    }
-
-
-    public final boolean isInternetOn() {
-
-        // get Connectivity Manager object to check connection
-        ConnectivityManager connec =
-                (ConnectivityManager)getActivity().getSystemService(getActivity().CONNECTIVITY_SERVICE );
-
-        // Check for network connections
-        if ( connec.getActiveNetworkInfo().getState() == android.net.NetworkInfo.State.CONNECTED ||
-                connec.getActiveNetworkInfo().getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getActiveNetworkInfo().getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getActiveNetworkInfo().getState() == android.net.NetworkInfo.State.CONNECTED ) {
-
-            return true;
-
-        } else if (
-                connec.getActiveNetworkInfo().getState() == android.net.NetworkInfo.State.DISCONNECTED ||
-                        connec.getActiveNetworkInfo().getState() == android.net.NetworkInfo.State.DISCONNECTED  ) {
-            hideProgressBar();
-            Toast.makeText(getActivity(), "Not Connected, please verify your Internet Connection", Toast.LENGTH_LONG).show();
-            return false;
+        if(progress != null) {
+            progress.setVisibility( View.GONE );
         }
-        return false;
-    }
 
-
-    private Cursor getAllMovies() {
-        m = getActivity().getContentResolver().query(CONTENT_URI, null, COLUMN_MOVIE_ID, null, null);
-        return m;
     }
 
     @Override
@@ -243,13 +214,14 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        data.moveToFirst();
+        favoritesCursorAdapter = new FavoritesCursorAdapter( mContext, data );
         favoritesCursorAdapter.swapCursor(data);
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
         mRecyclerView.setAdapter( favoritesCursorAdapter );
 
-        if (data.getCount() != 0) showWeatherDataView();
+        if (data.getCount() != 0) showFavoritesDataView();
 
     }
 
@@ -258,7 +230,7 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
         favoritesCursorAdapter.swapCursor(null);
     }
 
-    private void showWeatherDataView() {
+    private void showFavoritesDataView() {
         /* First, hide the loading indicator */
         hideProgressBar();
         mRecyclerView.setVisibility( View.VISIBLE);
@@ -267,17 +239,25 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onPause() {
         super.onPause();
-            if(m != null) {
-                m.close();
-            }
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if(m != null) {
-            m.close();
-        }
+    }
+
+    public final boolean isInternetOn() {
+
+        // get Connectivity Manager object to check connection
+        ConnectivityManager connec =
+                (ConnectivityManager) getActivity().getSystemService(CONNECTIVITY_SERVICE );
+
+        NetworkInfo activeNetwork = connec.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        return isConnected;
     }
 }
 

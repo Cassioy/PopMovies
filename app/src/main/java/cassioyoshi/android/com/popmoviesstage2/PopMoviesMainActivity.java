@@ -3,6 +3,8 @@ package cassioyoshi.android.com.popmoviesstage2;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,15 +22,13 @@ public class PopMoviesMainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView( R.layout.activity_pop_movies_main);
+        setContentView( R.layout.activity_pop_movies_main );
 
         // Find the toolbar view inside the activity layout
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         // Sets the Toolbar to act as the ActionBar for this Activity window.
         // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar(toolbar);
-
-
 
     }
 
@@ -63,17 +63,17 @@ public class PopMoviesMainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.popular:
-                addNewFrag( "popular" );
+                addNewFrag( SORT_MOVIE_POPULAR );
 
                 return true;
 
             case R.id.topRated:
-                addNewFrag( "top_rated" );
+                addNewFrag( SORT_MOVIE_TOP_RATED );
 
                 return true;
 
             case R.id.favorites:
-                addNewFrag( "favorites" );
+                addNewFrag( SORT_MOVIE_FAVORITE );
 
                 return true;
 
@@ -97,6 +97,7 @@ public class PopMoviesMainActivity extends AppCompatActivity {
     {
         super.onStart();
 
+
     }
 
     @Override
@@ -115,6 +116,19 @@ public class PopMoviesMainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frag_parent, fragment);
         fragmentTransaction.commit();
 
+    }
+
+    public final boolean isInternetOn() {
+
+        // get Connectivity Manager object to check connection
+        ConnectivityManager connec =
+                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE );
+
+        NetworkInfo activeNetwork = connec.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        return isConnected;
     }
 
 }

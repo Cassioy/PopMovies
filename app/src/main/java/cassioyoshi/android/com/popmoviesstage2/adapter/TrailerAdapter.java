@@ -1,4 +1,4 @@
-package cassioyoshi.android.com.popmoviesstage2;
+package cassioyoshi.android.com.popmoviesstage2.adapter;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -17,21 +17,21 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import cassioyoshi.android.com.popmoviesstage2.R;
 import cassioyoshi.android.com.popmoviesstage2.data.model.Result;
 
 /**
  * Created by cassioimamura on 9/21/17.
  */
 
-public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
+public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHolder> {
 
     List<Result> mHorizontalTrailers;
     private Context mContext;
     private static final String thumbUrl = "http://img.youtube.com/vi/";
     private static final String thumbSuffix = "/0.jpg";
 
-
-    public VideoAdapter(Context context, List<Result> myHorizontalTrailers){
+    public TrailerAdapter(Context context, List<Result> myHorizontalTrailers){
         this.mContext = context;
         this.mHorizontalTrailers = myHorizontalTrailers;
 
@@ -76,12 +76,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
-
-
         View v = LayoutInflater.from(parent.getContext())
                 .inflate( R.layout.trailer_row, parent, false);
-        // set the view's size, margins, paddings and layout parameters
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -106,6 +102,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
 
 
     public void watchYoutubeVideo(Context context, String id){
+
         Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
         Intent webIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse("http://www.youtube.com/watch?v=" + id));

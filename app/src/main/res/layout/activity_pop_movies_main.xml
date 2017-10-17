@@ -22,15 +22,6 @@
               android:fitsSystemWindows="true"
               android:id="@+id/frag_parent">
 
-    <ProgressBar
-        android:id="@+id/progressBarFetch"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
-
-
-
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -11,14 +11,14 @@ import java.net.URL;
 
 public class PopMovies implements Parcelable{
 
-    String posterSource;
-    String backdropSource;
+    public String posterSource;
+    public String backdropSource;
 
-    String mTitle;
-    String mReleaseDate;
-    String mVoteAvg;
-    String mPlotSynopsis;
-    String mId;
+    public String mTitle;
+    public String mReleaseDate;
+    public String mVoteAvg;
+    public String mPlotSynopsis;
+    public String mId;
 
 
     public PopMovies(String posterImage, String backdropImage, String title, String overview, String voteAvg, String releaseDate, String id) {
@@ -32,7 +32,7 @@ public class PopMovies implements Parcelable{
 
     }
 
-    private PopMovies(Parcel in) {
+    public PopMovies(Parcel in) {
         mTitle = in.readString();
         mPlotSynopsis = in.readString();
         mVoteAvg = in.readString();
