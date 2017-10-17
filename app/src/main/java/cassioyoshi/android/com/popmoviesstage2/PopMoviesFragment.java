@@ -53,6 +53,8 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     private List<PopMovies> moviesArrayList;
     private RecyclerView mRecyclerView;
     private TextView mNodata;
+    private TextView mNofavorite;
+    private TextView mFavoriteTip;
     private Button mRetry;
     private String category_chooser;
     public String jsonmovies;
@@ -89,6 +91,7 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
 
 
 
+
     public PopMoviesFragment() {
         setRetainInstance(true);
 
@@ -107,13 +110,16 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
             if (temp == "popular") {
                 category_chooser = temp;
             }
+            if (temp == "favorites"){
+                category_chooser = temp;
+            };
 
             mContext = rootView.getContext();
             mRecyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_main_recycler);
             mNodata = (TextView) rootView.findViewById( R.id.nointernet );
             mRetry = (Button) rootView.findViewById( R.id.retry_btn );
-            MovieDbHelper movieDbHelper = new MovieDbHelper( mContext );
-            mDb = movieDbHelper.getWritableDatabase();
+            mNofavorite = (TextView) rootView.findViewById( R.id.no_favorite );
+
 
 
         if(category_chooser == "popular" || category_chooser == "top_rated") {
@@ -170,16 +176,15 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
             });
 
 
-        }else{
-
+        }else if(category_chooser == "favorites"){
+            MovieDbHelper movieDbHelper = new MovieDbHelper( mContext );
+            mDb = movieDbHelper.getWritableDatabase();
             getLoaderManager().initLoader(ID_FAVORITES_LOADER, null, this);
 
             mRecyclerView.setHasFixedSize( true );
             mRecyclerView.setLayoutManager( gridLayoutManager);
 
             //make white background for Favorites screen
-            mRecyclerView.setBackgroundColor( ContextCompat.getColor(mContext, R.color.colorWhite) );
-
         }
         return rootView;
     }
@@ -225,7 +230,11 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
         mRecyclerView.smoothScrollToPosition(mPosition);
         mRecyclerView.setAdapter( favoritesCursorAdapter );
 
-        if (data.getCount() != 0) showFavoritesDataView();
+        if (data.getCount() != 0) {
+            showFavoritesDataView();
+        }else{
+            showNoFavoritesMessage(mContext);
+        }
 
     }
 
@@ -238,19 +247,36 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
         /* First, hide the loading indicator */
         hideProgressBar();
         mRecyclerView.setVisibility( View.VISIBLE);
+        mRecyclerView.setBackgroundColor( ContextCompat.getColor(mContext, R.color.colorWhite) );
+
     }
+
+    private void showNoFavoritesMessage(final Context context){
+
+                mRecyclerView.setBackgroundColor( ContextCompat.getColor(context, R.color.colorWhite) );
+                mNodata.setVisibility( View.GONE );
+                mRetry.setVisibility( View.GONE );
+                mNofavorite.setVisibility( View.VISIBLE );
+
+    }
+
+
 
     @Override
     public void onPause() {
         super.onPause();
-        mDb.close();
+        if(mDb != null) {
+            mDb.close();
+        }
 
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mDb.close();
+        if(mDb != null) {
+            mDb.close();
+        }
     }
 
     public final boolean isInternetOn() {

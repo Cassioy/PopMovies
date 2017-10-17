@@ -10,6 +10,8 @@
     <string name="vote_average">Rating</string>
     <string name="no_internet">Please Check your Internet Connection!</string>
     <string name="no_trailer">No Trailer Available...</string>
+    <string name="no_favorite">No favorite movies yet!</string>
+    <string name="tip_to_favorite"></string>
     <string name="button_retry">RETRY</string>
 
 
@@ -17,9 +19,6 @@
     <string name="LANGUAGE">en-US</string>
     <string name="PAGE">1</string>
 
-
-    <string name="retrofit_base_url">https://api.themoviedb.org/3/movie/</string>
-    <string name="youtube_web_url">http://www.youtube.com/watch?v=</string>
     <string-array name="spinner_items">
         <item>Sort By</item>
         <item>Popular</item>

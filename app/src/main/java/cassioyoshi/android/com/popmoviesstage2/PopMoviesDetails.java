@@ -167,7 +167,6 @@ public class PopMoviesDetails extends AppCompatActivity {
                                 noInternet = (TextView) findViewById( R.id.verify_internet );
                                 noTrailer = (TextView) findViewById( R.id.no_trailer );
                                 noInternet.setVisibility( View.VISIBLE );
-                                noTrailer.setVisibility( View.VISIBLE );
                             }
                         });
                     }
