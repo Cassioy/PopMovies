@@ -8,6 +8,9 @@
     <string name="release_date_title">Release Date</string>
     <string name="movie_info">Movie Information</string>
     <string name="vote_average">Rating</string>
+    <string name="review">Reviews</string>
+
+
     <string name="no_internet">Please Check your Internet Connection!</string>
     <string name="no_trailer">No Trailer Available...</string>
     <string name="no_favorite">No favorite movies yet!</string>

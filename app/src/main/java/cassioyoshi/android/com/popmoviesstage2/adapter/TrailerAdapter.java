@@ -41,6 +41,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
         //public ImageView mTrailerImage;
         public ImageView youtubeView;
         public TextView mTrailerTitle;
+        public ImageView mShare;
 
 
         public ViewHolder(final View itemView) {
@@ -48,6 +49,17 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
 
             youtubeView = (ImageView) itemView.findViewById( R.id.trailer_image );
             mTrailerTitle = (TextView) itemView.findViewById( R.id.trailer_title );
+            mShare = (ImageView) itemView.findViewById( R.id.share_button );
+            if(mShare != null){
+                mShare.setOnClickListener( new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Result trailerResult = mHorizontalTrailers.get( getAdapterPosition() );
+                        shareYoutubeVideo( itemView.getContext(), trailerResult.getKey() );
+
+                    }
+                });
+            }
 
             if (youtubeView != null) {
                 youtubeView.setOnClickListener( new View.OnClickListener() {
@@ -112,4 +124,13 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
             context.startActivity(webIntent);
         }
     }
-}
+    public void shareYoutubeVideo(Context context, String id){
+
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND, Uri.parse( "http://www.youtube.com/watch?v=" + id ));
+            sharingIntent.setType("text/plain");
+            context.startActivity(Intent.createChooser(sharingIntent, "Share using"));
+        }
+
+    }
+
+

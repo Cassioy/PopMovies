@@ -213,6 +213,8 @@ public class PopMoviesDetails extends AppCompatActivity {
             Drawable green = ContextCompat.getDrawable(getApplicationContext(),R.drawable.circle);
 
 
+
+
             Button rating = (Button) findViewById( R.id.rating_button );
             double votedAvg = Double.parseDouble(votes);
             if (votedAvg < 4){

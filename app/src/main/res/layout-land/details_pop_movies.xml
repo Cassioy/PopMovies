@@ -16,7 +16,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/detail_backdrop_height">
+        android:layout_height="330dp">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
@@ -245,7 +245,7 @@
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/spacing_medium">
+                android:layout_margin="@dimen/spacing_large">
 
                 <LinearLayout
                     style="@style/Widget.CardContent"
@@ -282,45 +282,17 @@
                         android:visibility="gone"/>
 
 
-
                     <android.support.v7.widget.RecyclerView
                             android:id="@+id/horizontal_recycler_view"
                             android:background="#fff"
                             android:layout_width="match_parent"
                             android:scrollbars="horizontal"
-                            android:layout_height="300dp"
+                            android:layout_height="wrap_content"
                             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 
                     <!--   Recycler View Item Row   -->
 
-
-                </LinearLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/spacing_medium">
-
-                <LinearLayout
-                    style="@style/Widget.CardContent"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/review_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/review"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-
-                    <TextView
-                        android:id="@+id/review_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_text" />
 
                 </LinearLayout>
 
