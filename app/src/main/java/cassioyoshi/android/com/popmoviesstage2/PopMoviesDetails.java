@@ -10,23 +10,32 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.transition.ChangeBounds;
+import android.support.transition.TransitionManager;
+import android.support.transition.TransitionSet;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import cassioyoshi.android.com.popmoviesstage2.adapter.ReviewsAdapter;
 import cassioyoshi.android.com.popmoviesstage2.adapter.TrailerAdapter;
 import cassioyoshi.android.com.popmoviesstage2.data.MovieContract;
 import cassioyoshi.android.com.popmoviesstage2.data.model.Result;
@@ -50,15 +59,23 @@ import static cassioyoshi.android.com.popmoviesstage2.data.MovieContract.MovieEn
 public class PopMoviesDetails extends AppCompatActivity {
 
     private RecyclerView mRecyclerViewTrailer;
+    private RecyclerView mRecyclerViewReviews;
     private RecyclerView.Adapter mAdapter;
+    private ReviewsAdapter mReviewsAdapter;
+    private DividerItemDecoration mDividerItemDecoration;
     private List<Result> trailersList;
     private List<ReviewList> reviewDescription;
     private Context mContext;
     private String totalReviews;
+    private int reviewNumber;
     private int id;
     private PopMovies favMovie;
     private TextView noTrailer;
     private TextView noInternet;
+    private TextView noReview;
+    private Button expandMoreLess;
+    private Animation animationUp;
+    private Animation animationDown;
 
     private Cursor cursor;
 
@@ -66,6 +83,8 @@ public class PopMoviesDetails extends AppCompatActivity {
     public LinearLayoutManager linearLayoutManager
             = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
 
+    public LinearLayoutManager verticalLayoutManager
+            = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
     @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -87,6 +106,10 @@ public class PopMoviesDetails extends AppCompatActivity {
 
         Log.v( "verificando id", " " + id);
             mRecyclerViewTrailer = (RecyclerView) findViewById( R.id.horizontal_recycler_view );
+            mRecyclerViewReviews = (RecyclerView) findViewById( R.id.review_recycler_view );
+            expandMoreLess = (Button) findViewById( R.id.showMoreLess );
+            noReview = (TextView) findViewById( R.id.no_review );
+
 
 
 // language is set to en-US and page is set to 1, API_KEY is found on config.xml resource not included in this project
@@ -100,16 +123,32 @@ public class PopMoviesDetails extends AppCompatActivity {
                     try{
                         int statusCode = responseReview.code();
                         ReviewData reviewData = responseReview.body();
-                        totalReviews = reviewData.getTotalResults().toString();
+                        reviewNumber = reviewData.getTotalResults();
+                        reviewDescription = reviewData.getResults();
 
                         Button reviewBtn = (Button) findViewById( R.id.review );
 
                         Log.v( "verificando", "Results Review" + statusCode);
-                        Log.v( "verificando", "Total Resultados " + totalReviews);
-
-                        reviewBtn.setText(totalReviews);
+                        Log.v( "verificando", "Total Resultados " + reviewNumber);
 
 
+                        reviewBtn.setText(String.valueOf(reviewNumber));
+                        mRecyclerViewReviews.setVisibility( View.VISIBLE );
+
+                        mReviewsAdapter = new ReviewsAdapter( mContext, reviewDescription );
+
+                        mRecyclerViewReviews.setHasFixedSize( true );
+                        mRecyclerViewReviews.setLayoutManager( verticalLayoutManager );
+                        mDividerItemDecoration = new DividerItemDecoration(mRecyclerViewReviews.getContext(),
+                                verticalLayoutManager.getOrientation());
+                        mRecyclerViewReviews.addItemDecoration(mDividerItemDecoration);
+                        mRecyclerViewReviews.setAdapter( mReviewsAdapter );
+                        mRecyclerViewReviews.setNestedScrollingEnabled( false );
+
+                        if(reviewNumber > 0){
+                            expandMoreLess.setVisibility( View.VISIBLE );
+                            noReview.setVisibility( View.GONE );
+                        }
 
                     }catch (Exception e){
                         Log.e("onFailure", "Requisicao detalhes vazia...");
@@ -120,7 +159,10 @@ public class PopMoviesDetails extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<ReviewData> callReview, Throwable t) {
                     Log.e("onFailure", "Requisicao detalhes falhou... ");
-                }
+
+
+
+                };
             });
 
             Call<Video> call = new RetrofitStart().getMovie()
@@ -212,7 +254,36 @@ public class PopMoviesDetails extends AppCompatActivity {
             Drawable yellow = ContextCompat.getDrawable(getApplicationContext(),R.drawable.circle_2);
             Drawable green = ContextCompat.getDrawable(getApplicationContext(),R.drawable.circle);
 
+            animationUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+            animationDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
 
+            expandMoreLess.setSelected( true );
+                expandMoreLess.setOnClickListener( new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                       if(expandMoreLess.isSelected()){
+                           TransitionManager.beginDelayedTransition(mRecyclerViewReviews, new TransitionSet()
+                                   .addTransition(new ChangeBounds()));
+                           LinearLayout.LayoutParams paramsTrue = new LinearLayout
+                                   .LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT );
+                           mRecyclerViewReviews.setLayoutParams( paramsTrue );
+                           expandMoreLess.setSelected( false );
+                           expandMoreLess.setText( getString( R.string.show_less ) );
+                           mRecyclerViewReviews.startAnimation( animationDown );
+                       }else{
+                           TransitionManager.beginDelayedTransition(mRecyclerViewReviews, new TransitionSet()
+                                   .addTransition(new ChangeBounds()));
+                           LinearLayout.LayoutParams paramsFalse = new LinearLayout
+                                   .LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 500 );
+                           mRecyclerViewReviews.setLayoutParams( paramsFalse );
+                           expandMoreLess.setSelected( true );
+                           expandMoreLess.setText( getString( R.string.show_more ) );
+                           mRecyclerViewReviews.startAnimation( animationUp );
+
+
+                       }
+                    }
+                } );
 
 
             Button rating = (Button) findViewById( R.id.rating_button );
@@ -356,6 +427,14 @@ public class PopMoviesDetails extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    public void setButtonVisibility(int numberOfReviews){
+        if(numberOfReviews == 0){
+            expandMoreLess.setVisibility( View.GONE );
+        }else {
+            expandMoreLess.setVisibility( View.VISIBLE );
+        }
     }
 
     public final boolean isInternetOn() {

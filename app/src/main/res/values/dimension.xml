@@ -13,9 +13,12 @@
     <dimen name="detail_backdrop_height">220dp</dimen>
     <dimen name="card_margin">16dp</dimen>
 
+    <dimen name="recycler_review_height">122dp</dimen>
+
     <dimen name="expanded_title_detail">25sp</dimen>
     <dimen name="normal_text_size">16sp</dimen>
     <dimen name="rating_text_size">22sp</dimen>
+    <dimen name="place_item_height">100dp</dimen>
     <dimen name="info_detail_text_size">18sp</dimen>
 
 

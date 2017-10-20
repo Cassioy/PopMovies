@@ -60,7 +60,22 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     public String jsonmovies;
     public SQLiteDatabase mDb;
 
+    private int mPosition = RecyclerView.NO_POSITION;
+
+    public static String temp;
+    public Context mContext;
+    public GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
+
     private static final int ID_FAVORITES_LOADER = 44;
+
+    public static final int INDEX_ID = 0;
+    public static final int INDEX_MOVIE_TITLE = 1;
+    public static final int INDEX_PLOT_SYNOPSIS = 2;
+    public static final int INDEX_RELEASE_DATE = 3;
+    public static final int INDEX_VOTE_AVG = 4;
+    public static final int INDEX_MOVIE_ID = 5;
+    public static final int INDEX_BACKDROP_IMAGE = 6;
+    public static final int INDEX_POSTER_IMAGE = 7;
 
     public static final String[] MAIN_FAVORITES = {
             MovieContract.MovieEntry._ID,
@@ -72,25 +87,6 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
             MovieContract.MovieEntry.COLUMN_BACKDROP_IMAGE,
             MovieContract.MovieEntry.COLUMN_POSTER_IMAGE
     };
-
-    public static final int INDEX_ID = 0;
-    public static final int INDEX_MOVIE_TITLE = 1;
-    public static final int INDEX_PLOT_SYNOPSIS = 2;
-    public static final int INDEX_RELEASE_DATE = 3;
-    public static final int INDEX_VOTE_AVG = 4;
-    public static final int INDEX_MOVIE_ID = 5;
-    public static final int INDEX_BACKDROP_IMAGE = 6;
-    public static final int INDEX_POSTER_IMAGE = 7;
-
-
-    private int mPosition = RecyclerView.NO_POSITION;
-
-    public static String temp;
-    public Context mContext;
-    public GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
-
-
-
 
     public PopMoviesFragment() {
         setRetainInstance(true);
@@ -145,6 +141,7 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
                         mRecyclerView.setLayoutManager( gridLayoutManager);
                         mRecyclerView.setAdapter( adapter );
 
+
                     }catch (Exception e){
                         Log.e("onFailure", "Requisicao vazia...");
 
@@ -157,7 +154,6 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
                     if(isInternetOn()){
 
                     }else{
-                        mRecyclerView.setVisibility( View.GONE );
                         mRecyclerView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorWhite) );
                         mNodata.setVisibility( View.VISIBLE );
                         mRetry.setVisibility( View.VISIBLE );

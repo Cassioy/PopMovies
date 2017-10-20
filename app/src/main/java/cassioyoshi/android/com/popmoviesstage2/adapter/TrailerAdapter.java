@@ -30,6 +30,8 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
     private Context mContext;
     private static final String thumbUrl = "http://img.youtube.com/vi/";
     private static final String thumbSuffix = "/0.jpg";
+    private static final String youTubeBaseUrl = "http://www.youtube.com/watch?v=";
+    private static final String youTubeAppUri = "vnd.youtube:";
 
     public TrailerAdapter(Context context, List<Result> myHorizontalTrailers){
         this.mContext = context;
@@ -115,9 +117,9 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
 
     public void watchYoutubeVideo(Context context, String id){
 
-        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(youTubeAppUri + id));
         Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://www.youtube.com/watch?v=" + id));
+                Uri.parse(youTubeBaseUrl + id));
         try {
             context.startActivity(appIntent);
         } catch (ActivityNotFoundException ex) {
@@ -126,7 +128,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
     }
     public void shareYoutubeVideo(Context context, String id){
 
-            Intent sharingIntent = new Intent(Intent.ACTION_SEND, Uri.parse( "http://www.youtube.com/watch?v=" + id ));
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND, Uri.parse( youTubeBaseUrl + id ));
             sharingIntent.setType("text/plain");
             context.startActivity(Intent.createChooser(sharingIntent, "Share using"));
         }
