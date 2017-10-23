@@ -27,7 +27,6 @@ public class PopMoviesMainActivity extends AppCompatActivity {
         // Sets the Toolbar to act as the ActionBar for this Activity window.
         // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar(toolbar);
-
     }
 
     @Override
@@ -102,6 +101,10 @@ public class PopMoviesMainActivity extends AppCompatActivity {
     public void onBackPressed() {
         // TODO Auto-generated method stub
         super.onBackPressed();
+
+    }
+
+    public void onImageSelected(){
 
     }
 

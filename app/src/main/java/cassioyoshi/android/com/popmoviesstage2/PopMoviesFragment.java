@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +38,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.ContentValues.TAG;
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static cassioyoshi.android.com.popmoviesstage2.data.MovieContract.MovieEntry.CONTENT_URI;
 
@@ -65,6 +67,9 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     public static String temp;
     public Context mContext;
     public GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
+    public GridLayoutManager gridTabletLayoutManager = new GridLayoutManager(mContext, 4);
+
+    public CustomItemClickListener mCallback;
 
     private static final int ID_FAVORITES_LOADER = 44;
 
@@ -93,6 +98,22 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
 
     }
 
+    public interface CustomItemClickListener {
+        public void onItemClick(View v, int position);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach( context );
+
+        try {
+            mCallback = (CustomItemClickListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnImageClickListener");
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate( R.layout.fragment_main, container, false );
@@ -112,11 +133,11 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
 
             mContext = rootView.getContext();
             mRecyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_main_recycler);
+            mRecyclerView.setHasFixedSize( true );
+            mRecyclerView.setLayoutManager( gridLayoutManager);
             mNodata = (TextView) rootView.findViewById( R.id.nointernet );
             mRetry = (Button) rootView.findViewById( R.id.retry_btn );
             mNofavorite = (TextView) rootView.findViewById( R.id.no_favorite );
-
-
 
         if(category_chooser == "popular" || category_chooser == "top_rated") {
 
@@ -136,9 +157,29 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
                         jsonmovies = ob.toString();
                         //Log.d( "Json formado", jsonmovies );
                         moviesArrayList = MovieJsonUtils.getSimpleMovieStringsFromJson(mContext, jsonmovies);
-                        adapter = new PopMoviesAdapter( mContext, moviesArrayList );
-                        mRecyclerView.setHasFixedSize( true );
-                        mRecyclerView.setLayoutManager( gridLayoutManager);
+                        adapter = new PopMoviesAdapter( mContext, moviesArrayList, new CustomItemClickListener() {
+                            @Override
+                            public void onItemClick(View v, int position) {
+                                Log.d(TAG, "clicked position:" + position);
+                                Bundle bundle = new Bundle();
+                                bundle.putString( "id", moviesArrayList.get(position).mId );
+                                bundle.putString( "backdropImage", moviesArrayList.get( position ).backdropSource );
+                                bundle.putString( "posterImage", moviesArrayList.get( position ).posterSource );
+                                bundle.putString(  "title", moviesArrayList.get( position ).mTitle );
+                                bundle.putString( "plotSynopsis", moviesArrayList.get( position ).mPlotSynopsis );
+                                bundle.putString( "releaseDate", moviesArrayList.get( position ).mReleaseDate );
+                                bundle.putString( "voteAvg", moviesArrayList.get( position ).mVoteAvg );
+
+                                PopMoviesDetailsFragment detailsFragment = new PopMoviesDetailsFragment();
+                                detailsFragment.setArguments(bundle);
+
+                                FragmentManager fragmentManager = ((PopMoviesMainActivity) mContext).getSupportFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.frag_parent, detailsFragment )
+                                        .commit();
+
+                            }
+                        });
                         mRecyclerView.setAdapter( adapter );
 
 
@@ -287,6 +328,7 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
 
         return isConnected;
     }
+
 }
 
 
