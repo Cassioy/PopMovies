@@ -1,21 +1,24 @@
 package cassioyoshi.android.com.popmoviesstage2;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 
-public class PopMoviesMainActivity extends AppCompatActivity {
+public class PopMoviesMainActivity extends AppCompatActivity implements PopMoviesFragment.CustomItemClickListener{
 
     private static final String SORT_MOVIE_POPULAR = "popular";
     private static final String SORT_MOVIE_TOP_RATED = "top_rated";
     private static final String SORT_MOVIE_FAVORITE = "favorites";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +30,8 @@ public class PopMoviesMainActivity extends AppCompatActivity {
         // Sets the Toolbar to act as the ActionBar for this Activity window.
         // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar(toolbar);
+
+
     }
 
     @Override
@@ -103,21 +108,23 @@ public class PopMoviesMainActivity extends AppCompatActivity {
         super.onBackPressed();
 
     }
-
-    public void onImageSelected(){
-
-    }
-
-
     public void addNewFrag(String value){
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         PopMoviesFragment fragment = new PopMoviesFragment();
         fragment.temp = value;
-        fragmentTransaction.replace(R.id.frag_parent, fragment);
-        fragmentTransaction.commit();
+        fragmentManager.beginTransaction().replace(R.id.frag_parent, fragment).commit();
+
 
     }
+
+    @Override
+    public void onItemClick(View v, int position) {
+        //Item click Implementation in PopMoviesFragment class
+        Log.d( "MainActivity", "onItemClick: Thumbnail clicks " );
+
+    }
+
+
 
 }
 

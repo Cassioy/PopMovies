@@ -3,6 +3,8 @@ package cassioyoshi.android.com.popmoviesstage2.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +15,9 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import cassioyoshi.android.com.popmoviesstage2.PopMoviesDetails;
+import cassioyoshi.android.com.popmoviesstage2.PopMoviesDetailsFragment;
 import cassioyoshi.android.com.popmoviesstage2.PopMoviesFragment;
+import cassioyoshi.android.com.popmoviesstage2.PopMoviesMainActivity;
 import cassioyoshi.android.com.popmoviesstage2.R;
 
 /**
@@ -28,6 +32,8 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
 
     private FavoritesCursorAdapterViewHolder holder;
 
+    private boolean mTwoPane;
+
 
     class FavoritesCursorAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
@@ -38,8 +44,13 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
             super(view);
 
             favThumbView = (ImageView) itemView.findViewById( R.id.favorite_thumbnail);
+            //Tag in sw600dp layouts for twoPane Layouts
+            if(favThumbView.getTag() != null) {
+                mTwoPane = true;
+            }else{
+                mTwoPane = false;
+            }
             view.setOnClickListener(this);
-
         }
 
         @Override
@@ -56,15 +67,31 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
             final String backdropImage = mCursor.getString( PopMoviesFragment.INDEX_BACKDROP_IMAGE );
             final String posterImage = mCursor.getString( PopMoviesFragment.INDEX_POSTER_IMAGE );
 
-            Intent detailsIntent = new Intent( mContext, PopMoviesDetails.class );
-            detailsIntent.putExtra( "backdropImage", backdropImage );
-            detailsIntent.putExtra( "posterImage", posterImage );
-            detailsIntent.putExtra( "title", movieTitle );
-            detailsIntent.putExtra( "plotSynopsis", synopsis );
-            detailsIntent.putExtra( "releaseDate", releaseDate );
-            detailsIntent.putExtra( "voteAvg", avgVote );
-            detailsIntent.putExtra( "id", movieId );
-            mContext.startActivity( detailsIntent );
+            Bundle cursorBundle = new Bundle();
+            cursorBundle.putString( "id", movieId );
+            cursorBundle.putString( "backdropImage", backdropImage );
+            cursorBundle.putString( "posterImage", posterImage );
+            cursorBundle.putString(  "title", movieTitle );
+            cursorBundle.putString( "plotSynopsis", synopsis );
+            cursorBundle.putString( "releaseDate", releaseDate );
+            cursorBundle.putString( "voteAvg", avgVote );
+
+            if(mTwoPane == true) {
+
+                PopMoviesDetailsFragment detailsFragment = new PopMoviesDetailsFragment();
+                detailsFragment.setArguments( cursorBundle );
+
+                FragmentManager fragmentManager = ((PopMoviesMainActivity) mContext).getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace( R.id.frag_details, detailsFragment )
+                        .commit();
+
+            }else{
+
+                Intent detailsIntent = new Intent( mContext, PopMoviesDetails.class );
+                detailsIntent.putExtras( cursorBundle );
+                mContext.startActivity( detailsIntent );
+            }
 
         }
     }
@@ -78,6 +105,7 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
     public FavoritesCursorAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.favorites_item_grid, parent, false);
+
 
         holder = new FavoritesCursorAdapterViewHolder(v, mContext);
         v.setFocusable(true);
@@ -120,6 +148,8 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
         mCursor = newCursor;
         notifyDataSetChanged();
     }
+
+
 }
 
 

@@ -1,6 +1,7 @@
 package cassioyoshi.android.com.popmoviesstage2;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -20,7 +21,30 @@ public class PopMoviesDetails extends AppCompatActivity {
 
         //overridePendingTransition(R.anim.trans_right_in, R.anim.trans_right_out);
 
+        if(savedInstanceState == null) {
+
+
+            PopMoviesDetailsFragment popDetailsFragment = new PopMoviesDetailsFragment();
+
+//            String thumbnailUrl = getIntent().getStringExtra( "posterImage" );
+//            String imageUrl = getIntent().getStringExtra( "backdropImage" );
+//            String title = getIntent().getStringExtra( "title" );
+//            String synopsis = getIntent().getStringExtra( "plotSynopsis" );
+//            String released = getIntent().getStringExtra( "releaseDate" );
+//            String votes = getIntent().getStringExtra( "voteAvg" );
+//            String video_id = getIntent().getStringExtra( "id" );
+//
+            popDetailsFragment.setArguments( getIntent().getExtras() );
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            //Handle when activity is recreated like on orientation Change
+            fragmentManager.beginTransaction()
+                    .replace( R.id.fragment_details_child, popDetailsFragment )
+                    .commit();
+
         }
+
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -50,8 +74,8 @@ public class PopMoviesDetails extends AppCompatActivity {
         // TODO Auto-generated method stub
         super.onBackPressed();
 
-        PopMoviesDetails.this.overridePendingTransition(R.anim.trans_left_out,
-                R.anim.trans_left_in);
+//        PopMoviesDetails.this.overridePendingTransition(R.anim.trans_left_out,
+//                R.anim.trans_left_in);
     }
 
     @Override

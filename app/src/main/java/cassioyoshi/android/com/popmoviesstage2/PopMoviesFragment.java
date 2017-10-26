@@ -1,17 +1,14 @@
 package cassioyoshi.android.com.popmoviesstage2;
 
-import android.app.Fragment;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -46,7 +43,7 @@ import static cassioyoshi.android.com.popmoviesstage2.data.MovieContract.MovieEn
  * Created by cassioimamura on 2/4/17.
  */
 
-public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PopMoviesFragment extends Fragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String LOG_TAG = PopMoviesFragment.class.getSimpleName();
 
@@ -67,11 +64,11 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     public static String temp;
     public Context mContext;
     public GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
-    public GridLayoutManager gridTabletLayoutManager = new GridLayoutManager(mContext, 4);
 
     public CustomItemClickListener mCallback;
 
     private static final int ID_FAVORITES_LOADER = 44;
+    public boolean mTwoPane;
 
     public static final int INDEX_ID = 0;
     public static final int INDEX_MOVIE_TITLE = 1;
@@ -94,12 +91,11 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     };
 
     public PopMoviesFragment() {
-        setRetainInstance(true);
-
+//        setRetainInstance( true );
     }
 
     public interface CustomItemClickListener {
-        public void onItemClick(View v, int position);
+        void onItemClick(View v, int position);
     }
 
     @Override
@@ -139,6 +135,7 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
             mRetry = (Button) rootView.findViewById( R.id.retry_btn );
             mNofavorite = (TextView) rootView.findViewById( R.id.no_favorite );
 
+
         if(category_chooser == "popular" || category_chooser == "top_rated") {
 
             //Return background to default
@@ -170,16 +167,33 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
                                 bundle.putString( "releaseDate", moviesArrayList.get( position ).mReleaseDate );
                                 bundle.putString( "voteAvg", moviesArrayList.get( position ).mVoteAvg );
 
-                                PopMoviesDetailsFragment detailsFragment = new PopMoviesDetailsFragment();
-                                detailsFragment.setArguments(bundle);
+                                //check if layout is more than 600 wide
 
-                                FragmentManager fragmentManager = ((PopMoviesMainActivity) mContext).getSupportFragmentManager();
-                                fragmentManager.beginTransaction()
-                                        .replace(R.id.frag_parent, detailsFragment )
-                                        .commit();
+                                if(getActivity().findViewById( R.id.frag_details ) != null){
+                                    mTwoPane = true;
+                                }else{
+                                    mTwoPane = false;
+                                }
 
+
+                                if(mTwoPane) {
+
+                                    PopMoviesDetailsFragment detailsFragment = new PopMoviesDetailsFragment();
+                                    detailsFragment.setArguments( bundle );
+                                    FragmentManager fragmentManager = ((PopMoviesMainActivity) mContext).getSupportFragmentManager();
+                                    fragmentManager.beginTransaction()
+                                                .replace( R.id.frag_details, detailsFragment, "details" )
+                                                .commit();
+
+                                }else {
+
+                                        final Intent intent = new Intent(mContext, PopMoviesDetails.class);
+                                        intent.putExtras(bundle);
+                                        startActivity( intent );
+                                    }
                             }
                         });
+
                         mRecyclerView.setAdapter( adapter );
 
 
@@ -220,8 +234,6 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
 
             mRecyclerView.setHasFixedSize( true );
             mRecyclerView.setLayoutManager( gridLayoutManager);
-
-            //make white background for Favorites screen
         }
         return rootView;
     }
@@ -236,7 +248,7 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int loaderId, Bundle bundle) {
+    public android.support.v4.content.Loader<Cursor> onCreateLoader(int loaderId, Bundle bundle) {
 
         switch (loaderId) {
 
@@ -246,7 +258,7 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
                 String sortOrder = MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " ASC";
 
 
-                return new CursorLoader(mContext,
+                return new android.support.v4.content.CursorLoader(mContext,
                         favoritesQueryUri,
                         MAIN_FAVORITES,
                         null,
@@ -259,13 +271,14 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, final Cursor data) {
         data.moveToFirst();
         favoritesCursorAdapter = new FavoritesCursorAdapter( mContext, data );
         favoritesCursorAdapter.swapCursor(data);
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
-        mRecyclerView.setAdapter( favoritesCursorAdapter );
+        mRecyclerView.setAdapter( favoritesCursorAdapter);
+
 
         if (data.getCount() != 0) {
             showFavoritesDataView();
@@ -276,7 +289,7 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
         favoritesCursorAdapter.swapCursor(null);
     }
 
@@ -323,13 +336,19 @@ public class PopMoviesFragment extends Fragment implements LoaderManager.LoaderC
                 (ConnectivityManager) getActivity().getSystemService(CONNECTIVITY_SERVICE );
 
         NetworkInfo activeNetwork = connec.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
 
-        return isConnected;
+        return activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+
+    }
 }
+
 
 
 

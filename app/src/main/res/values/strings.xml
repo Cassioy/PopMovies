@@ -17,9 +17,12 @@
     <string name="no_review">No Review Available</string>
     <string name="tip_to_favorite"></string>
     <string name="button_retry">RETRY</string>
+    <string name="select_movie">Please select a movie to show details!</string>
 
     <string name="show_more">show more</string>
     <string name="show_less">show less</string>
+
+    <string name="two_pane">twopane</string>
 
 
     <string name="action_settings">Settings</string>

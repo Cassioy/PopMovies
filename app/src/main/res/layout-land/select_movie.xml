@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:id="@+id/fragment_details_main"
+              android:background="@color/colorWhite"
               android:layout_height="match_parent">
-
-    <FrameLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fragment_details_child"
-        xmlns:tools="http://schemas.android.com/tools"
-        tools:layout="@layout/details_pop_movies">
-
-    </FrameLayout>
-
+        android:textAlignment="center"
+        android:gravity="center"
+        android:text="@string/select_movie"/>
 
 </LinearLayout>
-

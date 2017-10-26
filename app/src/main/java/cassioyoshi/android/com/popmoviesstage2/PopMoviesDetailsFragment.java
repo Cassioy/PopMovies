@@ -15,9 +15,11 @@ import android.support.transition.TransitionManager;
 import android.support.transition.TransitionSet;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,6 +78,9 @@ public class PopMoviesDetailsFragment extends Fragment {
     private Animation animationUp;
     private Animation animationDown;
 
+    int YOUR_FRAGMENT_POSITION = 1;
+
+
     public LinearLayoutManager linearLayoutManager
             = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
 
@@ -83,271 +88,270 @@ public class PopMoviesDetailsFragment extends Fragment {
             = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
 
     public PopMoviesDetailsFragment(){
-
+        setRetainInstance( true );
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach( context );
-    }
 
-    public static  PopMoviesDetailsFragment newInstance(int index){
-        PopMoviesDetailsFragment f = new PopMoviesDetailsFragment();
-
-        Bundle args = new Bundle();
-        f.setArguments( args );
-
-        return f;
-    }
-
-    public int getShownIndex(){
-        return getArguments().getInt("index, 0");
-    }
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
-        final View detailsView = inflater.inflate( R.layout.details_pop_movies, container, false );
+
         Bundle args = getArguments();
-        mContext = detailsView.getContext();
+
+        final View detailsView;
 
 
-        String thumbnailUrl = args.getString("posterImage");
-        String imageUrl = args.getString("backdropImage");
-        String title = args.getString("title");
-        String synopsis = args.getString("plotSynopsis");
-        String released = args.getString( "releaseDate" );
-        String votes = args.getString( "voteAvg" );
-        String video_id = args.getString( "id" );
-        if(video_id != null) {
-            id = Integer.parseInt( video_id );
-        }
+        if (args == null) {
+            detailsView = inflater.inflate( R.layout.select_movie, container, false );
 
-        detailsView.setBackgroundColor(0);
-
-        favMovie = new PopMovies( thumbnailUrl, imageUrl, title, synopsis, votes, released, video_id );
-        mRecyclerViewTrailer = (RecyclerView) detailsView.findViewById( R.id.horizontal_recycler_view );
-        mRecyclerViewReviews = (RecyclerView) detailsView.findViewById( R.id.review_recycler_view );
-        expandMoreLess = (Button) detailsView.findViewById( R.id.showMoreLess );
-        noReview = (TextView) detailsView.findViewById( R.id.no_review );
-
-
-        if(video_id == null) {
-            Log.d( TAG, "onCreateView: " + favMovie);
-            detailsView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorWhite));
             return detailsView;
-        } else {
-            Log.v( "verificando id", " " + id );
+
+        }else{
+
+            detailsView = inflater.inflate( R.layout.details_pop_movies, container, false );
 
 
+            mContext = detailsView.getContext();
 
-// language is set to en-US and page is set to 1, API_KEY is found on config.xml resource not included in this project
+            String thumbnailUrl = args.getString( "posterImage" );
+            String imageUrl = args.getString( "backdropImage" );
+            String title = args.getString( "title" );
+            String synopsis = args.getString( "plotSynopsis" );
+            String released = args.getString( "releaseDate" );
+            String votes = args.getString( "voteAvg" );
+            String video_id = args.getString( "id" );
+            if (video_id != null) {
+                id = Integer.parseInt( video_id );
+            }
 
-            Call<ReviewData> callReview = new RetrofitStart().getMovie()
-                    .requestReviews( id, getString( R.string.API_KEY ), getString( R.string.LANGUAGE ), Integer.parseInt( getString( R.string.PAGE ) ) );
-            callReview.enqueue( new Callback<ReviewData>() {
-                @Override
-                public void onResponse(Call<ReviewData> callReview, Response<ReviewData> responseReview) {
+            favMovie = new PopMovies( thumbnailUrl, imageUrl, title, synopsis, votes, released, video_id );
 
-                    try {
-                        int statusCode = responseReview.code();
-                        ReviewData reviewData = responseReview.body();
-                        reviewNumber = reviewData.getTotalResults();
-                        reviewDescription = reviewData.getResults();
+//            detailsView.setBackgroundColor( 0 );
 
-                        Button reviewBtn = (Button) getActivity().findViewById( R.id.review );
-
-                        Log.v( "verificando", "Results Review" + statusCode );
-                        Log.v( "verificando", "Total Resultados " + reviewNumber );
-
-
-                        reviewBtn.setText( String.valueOf( reviewNumber ) );
-                        mRecyclerViewReviews.setVisibility( View.VISIBLE );
-
-                        mReviewsAdapter = new ReviewsAdapter( mContext, reviewDescription );
-
-                        mRecyclerViewReviews.setHasFixedSize( true );
-                        mRecyclerViewReviews.setLayoutManager( verticalLayoutManager );
-                        mDividerItemDecoration = new DividerItemDecoration( mRecyclerViewReviews.getContext(),
-                                verticalLayoutManager.getOrientation() );
-                        mRecyclerViewReviews.addItemDecoration( mDividerItemDecoration );
-                        mRecyclerViewReviews.setAdapter( mReviewsAdapter );
-                        mRecyclerViewReviews.setNestedScrollingEnabled( false );
-
-                        if (reviewNumber > 0) {
-                            expandMoreLess.setVisibility( View.VISIBLE );
-                            noReview.setVisibility( View.GONE );
-                        }
-
-                    } catch (Exception e) {
-                        Log.e( "onFailure", "Requisicao detalhes vazia..." );
-
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ReviewData> callReview, Throwable t) {
-                    Log.e( "onFailure", "Requisicao detalhes falhou... " );
+            mRecyclerViewTrailer = (RecyclerView) detailsView.findViewById( R.id.horizontal_recycler_view );
+            mRecyclerViewReviews = (RecyclerView) detailsView.findViewById( R.id.review_recycler_view );
+            expandMoreLess = (Button) detailsView.findViewById( R.id.showMoreLess );
+            noReview = (TextView) detailsView.findViewById( R.id.no_review );
 
 
-                }
-
-                ;
-            } );
-
-            Call<Video> call = new RetrofitStart().getMovie()
-                    .requestVideos( id, getString( R.string.API_KEY ), getString( R.string.LANGUAGE ), Integer.parseInt( getString( R.string.PAGE ) ) );
-            call.enqueue( new Callback<Video>() {
-                @Override
-                public void onResponse(Call<Video> call, Response<Video> response) {
-
-                    try {
-                        int statusCode = response.code();
-                        Video selectedVideo = response.body();
-                        trailersList = selectedVideo.getResults();
-
-                        Log.v( "verificando", "Results " + statusCode );
-                        Log.v( "VideoObject", "Results " + selectedVideo );
-                        Log.v( "List Results", "Results " + trailersList );
-
-                        mAdapter = new TrailerAdapter( mContext, trailersList );
-
-                        mRecyclerViewTrailer.setHasFixedSize( true );
-
-                        mRecyclerViewTrailer.setLayoutManager( linearLayoutManager );
-                        mRecyclerViewTrailer.setAdapter( mAdapter );
-
-                    } catch (Exception e) {
-                        Log.e( "onFailure", "Requisicao detalhes vazia..." );
-
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Video> call, Throwable t) {
-                    Log.e( "onFailure", "Requisicao detalhes falhou... " );
-                    if (isInternetOn()) {
-
-                    } else {
-
-                        Handler mainHandler = new Handler( Looper.getMainLooper() );
-                        mainHandler.post( new Runnable() {
-                            @Override
-                            public void run() {
-                                // code to interact with UI
-                                mRecyclerViewTrailer.setVisibility( View.GONE );
-                                noInternet = (TextView) detailsView.findViewById( R.id.verify_internet );
-                                noTrailer = (TextView) detailsView.findViewById( R.id.no_trailer );
-                                noInternet.setVisibility( View.VISIBLE );
-                            }
-                        } );
-                    }
-                }
-            } );
-
-
-            CollapsingToolbarLayout collapsingToolbar =
-                    (CollapsingToolbarLayout) detailsView.findViewById( R.id.collapsing_toolbar );
-            collapsingToolbar.setTitle( title );
-
-            final ImageButton fab = (ImageButton) detailsView.findViewById( R.id.fab );
-
-
-            ImageView thumb = (ImageView) detailsView.findViewById( R.id.movie_info_thumbnail );
-            Picasso.with( detailsView.getContext() ).load( thumbnailUrl ).into( thumb );
-
-
-            loadBackdrop( imageUrl, detailsView );
-
-            if (checkDatabase( title )) {
-                fab.setSelected( true );
-                fab.setImageResource( R.drawable.ic_grade_yellow_48px );
-
+            if (video_id == null) {
+                Log.d( TAG, "onCreateView: " + favMovie );
+                detailsView.setBackgroundColor( ContextCompat.getColor( mContext, R.color.colorWhite ) );
+                return detailsView;
             } else {
-                fab.setSelected( false );
-                fab.setImageResource( R.drawable.ic_grade_white_48px );
-            }
+                Log.v( "verificando id", " " + id );
 
 
-            TextView overview = (TextView) detailsView.findViewById( plot_synopsis );
-            overview.setText( synopsis );
+            // language is set to en-US and page is set to 1, API_KEY is found on config.xml resource not included in this project
 
-            TextView releaseDate = (TextView) detailsView.findViewById( release_date );
-            releaseDate.setText( released );
+                Call<ReviewData> callReview = new RetrofitStart().getMovie()
+                        .requestReviews( id, getString( R.string.API_KEY ), getString( R.string.LANGUAGE ), Integer.parseInt( getString( R.string.PAGE ) ) );
+                callReview.enqueue( new Callback<ReviewData>() {
+                    @Override
+                    public void onResponse(Call<ReviewData> callReview, Response<ReviewData> responseReview) {
+
+                        try {
+                            int statusCode = responseReview.code();
+                            ReviewData reviewData = responseReview.body();
+                            reviewNumber = reviewData.getTotalResults();
+                            reviewDescription = reviewData.getResults();
+
+                            Button reviewBtn = (Button) getActivity().findViewById( R.id.review );
+
+                            Log.v( "verificando", "Results Review" + statusCode );
+                            Log.v( "verificando", "Total Resultados " + reviewNumber );
 
 
-            Drawable red = ContextCompat.getDrawable( detailsView.getContext(), R.drawable.circle_3 );
-            Drawable yellow = ContextCompat.getDrawable( detailsView.getContext(), R.drawable.circle_2 );
-            Drawable green = ContextCompat.getDrawable( detailsView.getContext(), R.drawable.circle );
+                            reviewBtn.setText( String.valueOf( reviewNumber ) );
+                            mRecyclerViewReviews.setVisibility( View.VISIBLE );
 
-            animationUp = AnimationUtils.loadAnimation( detailsView.getContext(), R.anim.slide_up );
-            animationDown = AnimationUtils.loadAnimation( detailsView.getContext(), R.anim.slide_down );
+                            mReviewsAdapter = new ReviewsAdapter( mContext, reviewDescription );
 
-            expandMoreLess.setSelected( true );
-            expandMoreLess.setOnClickListener( new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (expandMoreLess.isSelected()) {
-                        TransitionManager.beginDelayedTransition( mRecyclerViewReviews, new TransitionSet()
-                                .addTransition( new ChangeBounds() ) );
-                        LinearLayout.LayoutParams paramsTrue = new LinearLayout
-                                .LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT );
-                        mRecyclerViewReviews.setLayoutParams( paramsTrue );
-                        expandMoreLess.setSelected( false );
-                        expandMoreLess.setText( getString( R.string.show_less ) );
-                        mRecyclerViewReviews.startAnimation( animationDown );
-                    } else {
-                        TransitionManager.beginDelayedTransition( mRecyclerViewReviews, new TransitionSet()
-                                .addTransition( new ChangeBounds() ) );
-                        LinearLayout.LayoutParams paramsFalse = new LinearLayout
-                                .LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 500 );
-                        mRecyclerViewReviews.setLayoutParams( paramsFalse );
-                        expandMoreLess.setSelected( true );
-                        expandMoreLess.setText( getString( R.string.show_more ) );
-                        mRecyclerViewReviews.startAnimation( animationUp );
+                            mRecyclerViewReviews.setHasFixedSize( true );
+                            mRecyclerViewReviews.setLayoutManager( verticalLayoutManager );
+                            mDividerItemDecoration = new DividerItemDecoration( mRecyclerViewReviews.getContext(),
+                                    verticalLayoutManager.getOrientation() );
+                            mRecyclerViewReviews.addItemDecoration( mDividerItemDecoration );
+                            mRecyclerViewReviews.setAdapter( mReviewsAdapter );
+                            mRecyclerViewReviews.setNestedScrollingEnabled( false );
+
+                            if (reviewNumber > 0) {
+                                expandMoreLess.setVisibility( View.VISIBLE );
+                                noReview.setVisibility( View.GONE );
+                            }
+
+                        } catch (Exception e) {
+                            Log.e( "onFailure", "Requisicao detalhes vazia..." );
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ReviewData> callReview, Throwable t) {
+                        Log.e( "onFailure", "Requisicao detalhes falhou... " );
 
 
                     }
+
+                    ;
+                } );
+
+                Call<Video> call = new RetrofitStart().getMovie()
+                        .requestVideos( id, getString( R.string.API_KEY ), getString( R.string.LANGUAGE ), Integer.parseInt( getString( R.string.PAGE ) ) );
+                call.enqueue( new Callback<Video>() {
+                    @Override
+                    public void onResponse(Call<Video> call, Response<Video> response) {
+
+                        try {
+                            int statusCode = response.code();
+                            Video selectedVideo = response.body();
+                            trailersList = selectedVideo.getResults();
+
+                            Log.v( "verificando", "Results " + statusCode );
+                            Log.v( "VideoObject", "Results " + selectedVideo );
+                            Log.v( "List Results", "Results " + trailersList );
+
+                            mAdapter = new TrailerAdapter( mContext, trailersList );
+
+                            mRecyclerViewTrailer.setHasFixedSize( true );
+
+                            mRecyclerViewTrailer.setLayoutManager( linearLayoutManager );
+                            mRecyclerViewTrailer.setAdapter( mAdapter );
+
+                        } catch (Exception e) {
+                            Log.e( "onFailure", "Requisicao detalhes vazia..." );
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Video> call, Throwable t) {
+                        Log.e( "onFailure", "Requisicao detalhes falhou... " );
+                        if (isInternetOn()) {
+
+                        } else {
+
+                            Handler mainHandler = new Handler( Looper.getMainLooper() );
+                            mainHandler.post( new Runnable() {
+                                @Override
+                                public void run() {
+                                    // code to interact with UI
+                                    mRecyclerViewTrailer.setVisibility( View.GONE );
+                                    noInternet = (TextView) detailsView.findViewById( R.id.verify_internet );
+                                    noTrailer = (TextView) detailsView.findViewById( R.id.no_trailer );
+                                    noInternet.setVisibility( View.VISIBLE );
+                                }
+                            } );
+                        }
+                    }
+                } );
+
+                if( getActivity().findViewById( R.id.frag_details ) == null) {
+                    final Toolbar toolbar = (Toolbar) detailsView.findViewById( R.id.toolbarDetails );
+                    ((AppCompatActivity) getActivity()).setSupportActionBar( toolbar );
+                    ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled( true );
                 }
-            } );
 
 
-            Button rating = (Button) detailsView.findViewById( R.id.rating_button );
-            double votedAvg = Double.parseDouble( votes );
-            if (votedAvg < 4) {
-                rating.setBackground( red );
-                rating.setText( votes );
-            } else if (votedAvg < 7) {
-                rating.setBackground( yellow );
-                rating.setText( votes );
-            } else if (votedAvg >= 7) {
-                rating.setBackground( green );
-                rating.setText( votes );
+                CollapsingToolbarLayout collapsingToolbar =
+                        (CollapsingToolbarLayout) detailsView.findViewById( R.id.collapsing_toolbar );
+                collapsingToolbar.setTitle( title );
+
+                final ImageButton fab = (ImageButton) detailsView.findViewById( R.id.fab );
+
+
+                ImageView thumb = (ImageView) detailsView.findViewById( R.id.movie_info_thumbnail );
+                Picasso.with( detailsView.getContext() ).load( thumbnailUrl ).into( thumb );
+
+
+                loadBackdrop( imageUrl, detailsView );
+
+                if (checkDatabase( title )) {
+                    fab.setSelected( true );
+                    fab.setImageResource( R.drawable.ic_grade_yellow_48px );
+
+                } else {
+                    fab.setSelected( false );
+                    fab.setImageResource( R.drawable.ic_grade_white_48px );
+                }
+
+
+                TextView overview = (TextView) detailsView.findViewById( plot_synopsis );
+                overview.setText( synopsis );
+
+                TextView releaseDate = (TextView) detailsView.findViewById( release_date );
+                releaseDate.setText( released );
+
+
+                Drawable red = ContextCompat.getDrawable( detailsView.getContext(), R.drawable.circle_3 );
+                Drawable yellow = ContextCompat.getDrawable( detailsView.getContext(), R.drawable.circle_2 );
+                Drawable green = ContextCompat.getDrawable( detailsView.getContext(), R.drawable.circle );
+
+                animationUp = AnimationUtils.loadAnimation( detailsView.getContext(), R.anim.slide_up );
+                animationDown = AnimationUtils.loadAnimation( detailsView.getContext(), R.anim.slide_down );
+
+                expandMoreLess.setSelected( true );
+                expandMoreLess.setOnClickListener( new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (expandMoreLess.isSelected()) {
+                            TransitionManager.beginDelayedTransition( mRecyclerViewReviews, new TransitionSet()
+                                    .addTransition( new ChangeBounds() ) );
+                            LinearLayout.LayoutParams paramsTrue = new LinearLayout
+                                    .LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT );
+                            mRecyclerViewReviews.setLayoutParams( paramsTrue );
+                            expandMoreLess.setSelected( false );
+                            expandMoreLess.setText( getString( R.string.show_less ) );
+                            mRecyclerViewReviews.startAnimation( animationDown );
+                        } else {
+                            TransitionManager.beginDelayedTransition( mRecyclerViewReviews, new TransitionSet()
+                                    .addTransition( new ChangeBounds() ) );
+                            LinearLayout.LayoutParams paramsFalse = new LinearLayout
+                                    .LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 500 );
+                            mRecyclerViewReviews.setLayoutParams( paramsFalse );
+                            expandMoreLess.setSelected( true );
+                            expandMoreLess.setText( getString( R.string.show_more ) );
+                            mRecyclerViewReviews.startAnimation( animationUp );
+
+
+                        }
+                    }
+                } );
+
+
+                Button rating = (Button) detailsView.findViewById( R.id.rating_button );
+                double votedAvg = Double.parseDouble( votes );
+                if (votedAvg < 4) {
+                    rating.setBackground( red );
+                    rating.setText( votes );
+                } else if (votedAvg < 7) {
+                    rating.setBackground( yellow );
+                    rating.setText( votes );
+                } else if (votedAvg >= 7) {
+                    rating.setBackground( green );
+                    rating.setText( votes );
+                }
+
+                fab.setOnClickListener( new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        fab.setImageResource( fab.isSelected() ? R.drawable.ic_grade_white_48px : R.drawable.ic_grade_yellow_48px );
+                        if (!fab.isSelected()) {
+                            addFavoriteMovie( favMovie );
+                            Log.d( "adding Favorite Movie", "name: " + favMovie.mTitle );
+                            fab.setSelected( true );
+
+                        } else {
+                            removeFavoriteMovie( favMovie );
+                            Log.d( "Remove Favorite", "Removing Favorite" );
+                            fab.setSelected( false );
+                        }
+                    }
+
+                } );
             }
 
-//            Acesso a pagina de reviews TBD
-//            Button reviews = (Button) findViewById(R.id.review);
-
-
-            fab.setOnClickListener( new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    fab.setImageResource( fab.isSelected() ? R.drawable.ic_grade_white_48px : R.drawable.ic_grade_yellow_48px );
-                    if (!fab.isSelected()) {
-                        addFavoriteMovie( favMovie );
-                        Log.d( "adding Favorite Movie", "name: " + favMovie.mTitle );
-                        fab.setSelected( true );
-
-                    } else {
-                        removeFavoriteMovie( favMovie );
-                        Log.d( "Remove Favorite", "Removing Favorite" );
-                        fab.setSelected( false );
-                    }
-                }
-
-            } );
+            return detailsView;
         }
-
-
-        return detailsView;
     }
 
     private void loadBackdrop(String url, View v) {
@@ -383,8 +387,6 @@ public class PopMoviesDetailsFragment extends Fragment {
         String[] mSelectionArgs = {arg};
 
         getActivity().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, mSelectionClause, mSelectionArgs);
-
-
 //
 //        Cursor r = getContentResolver().query(CONTENT_URI, null, COLUMN_MOVIE_ID, null, null);
 //        Log.d( "checking cursor", "removeFavoriteMovie: " + r.getCount() );
@@ -428,6 +430,17 @@ public class PopMoviesDetailsFragment extends Fragment {
         return isConnected;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
 
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
 
 }

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <ProgressBar
-        android:id="@+id/progressBarFetchFav"
+        android:id="@+id/progressBarFetch"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,10 +13,9 @@
         android:indeterminate="true" />
 
     <ImageView
-        android:id="@+id/favorite_thumbnail"
-        android:tag="@string/two_pane"
-        android:layout_width="match_parent"
+        android:id="@+id/thumbnail_image"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:adjustViewBounds="true"/>
+        android:adjustViewBounds="true" />
 
 </FrameLayout>
