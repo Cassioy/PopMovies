@@ -13,11 +13,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitStart {
 
     private final Retrofit retrofit;
+    private static final String baseURL = "https://api.themoviedb.org/3/movie/";
 
     public RetrofitStart(){
 
         retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.themoviedb.org/3/movie/")
+                .baseUrl(baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }

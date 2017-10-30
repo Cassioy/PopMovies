@@ -67,7 +67,6 @@ public class PopMoviesDetailsFragment extends Fragment {
     private List<Result> trailersList;
     private List<ReviewList> reviewDescription;
     private Context mContext;
-    private String totalReviews;
     private int reviewNumber;
     private int id;
     private PopMovies favMovie;
@@ -239,6 +238,7 @@ public class PopMoviesDetailsFragment extends Fragment {
                                     noInternet = (TextView) detailsView.findViewById( R.id.verify_internet );
                                     noTrailer = (TextView) detailsView.findViewById( R.id.no_trailer );
                                     noInternet.setVisibility( View.VISIBLE );
+                                    noTrailer.setVisibility( View.VISIBLE );
                                 }
                             } );
                         }

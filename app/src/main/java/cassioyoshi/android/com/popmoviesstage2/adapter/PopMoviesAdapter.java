@@ -27,8 +27,6 @@ public class PopMoviesAdapter extends RecyclerView.Adapter<PopMoviesAdapter.View
     public List<PopMovies> mPopMoviesList;
     public PopMoviesFragment.CustomItemClickListener customlistener;
 
-    private static final int VIEW_TYPE_DATA = 1;
-    private static final int VIEW_TYPE_EMPTY = 2;
 
     /** This is a custom constructor **/
 
@@ -70,39 +68,6 @@ public class PopMoviesAdapter extends RecyclerView.Adapter<PopMoviesAdapter.View
         String url = mPopMoviesList.get(position).getPosterSource();
         Picasso.with(mContext).load(url).into(holder.iconView);
 
-//        holder.iconView.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent detailsIntent = new Intent( mContext, PopMoviesDetails.class );
-//                detailsIntent.putExtra( "backdropImage", mPopMoviesList.get( position ).backdropSource );
-//                detailsIntent.putExtra( "posterImage", mPopMoviesList.get( position ).posterSource );
-//                detailsIntent.putExtra( "title", mPopMoviesList.get( position ).mTitle );
-//                detailsIntent.putExtra( "plotSynopsis", mPopMoviesList.get( position ).mPlotSynopsis );
-//                detailsIntent.putExtra( "releaseDate", mPopMoviesList.get( position ).mReleaseDate );
-//                detailsIntent.putExtra( "voteAvg", mPopMoviesList.get( position ).mVoteAvg );
-//                detailsIntent.putExtra( "id", mPopMoviesList.get( position ).mId );
-//                mContext.startActivity( detailsIntent );
-//
-//                Bundle bundle = new Bundle();
-//                bundle.putString( "backdropImage", mPopMoviesList.get( position ).backdropSource );
-//                bundle.putString( "posterImage", mPopMoviesList.get( position ).posterSource );
-//                bundle.putString(  "title", mPopMoviesList.get( position ).mTitle );
-//                bundle.putString( "plotSynopsis", mPopMoviesList.get( position ).mPlotSynopsis );
-//                bundle.putString( "releaseDate", mPopMoviesList.get( position ).mReleaseDate );
-//                bundle.putString( "voteAvg", mPopMoviesList.get( position ).mVoteAvg );
-//                bundle.putString( "id", mPopMoviesList.get( position ).mId );
-//
-//                PopMoviesDetailsFragment detailsFragment = new PopMoviesDetailsFragment();
-//                detailsFragment.setArguments(bundle);
-//
-//                FragmentManager fragmentManager = ((PopMoviesDetails) mContext).getSupportFragmentManager();
-//                fragmentManager.beginTransaction()
-//                        .add(R.id.fragment_details_child, detailsFragment )
-//                .commit();
-//
-//
-//            }
-//        });
     }
 
     @Override

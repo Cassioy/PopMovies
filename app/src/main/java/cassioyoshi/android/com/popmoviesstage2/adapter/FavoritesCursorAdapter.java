@@ -34,6 +34,14 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
 
     private boolean mTwoPane;
 
+    private static final String posterSource = "posterImage";
+    private static final String backdropSource = "backdropImage";
+    private static final String mTitle = "title";
+    private static final String mPlotSynopsis = "plotSynopsis";
+    private static final String mVoteAvg = "voteAvg";
+    private static final String mReleaseDate = "releaseDate";
+    private static final String mId = "id";
+
 
     class FavoritesCursorAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
@@ -68,13 +76,13 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
             final String posterImage = mCursor.getString( PopMoviesFragment.INDEX_POSTER_IMAGE );
 
             Bundle cursorBundle = new Bundle();
-            cursorBundle.putString( "id", movieId );
-            cursorBundle.putString( "backdropImage", backdropImage );
-            cursorBundle.putString( "posterImage", posterImage );
-            cursorBundle.putString(  "title", movieTitle );
-            cursorBundle.putString( "plotSynopsis", synopsis );
-            cursorBundle.putString( "releaseDate", releaseDate );
-            cursorBundle.putString( "voteAvg", avgVote );
+            cursorBundle.putString( mId, movieId );
+            cursorBundle.putString( backdropSource, backdropImage );
+            cursorBundle.putString( posterSource, posterImage );
+            cursorBundle.putString( mTitle, movieTitle );
+            cursorBundle.putString( mPlotSynopsis, synopsis );
+            cursorBundle.putString( mReleaseDate, releaseDate );
+            cursorBundle.putString( mVoteAvg, avgVote );
 
             if(mTwoPane == true) {
 

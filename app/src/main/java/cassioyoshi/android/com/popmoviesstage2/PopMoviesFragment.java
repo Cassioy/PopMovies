@@ -53,7 +53,6 @@ public class PopMoviesFragment extends Fragment implements android.support.v4.ap
     private RecyclerView mRecyclerView;
     private TextView mNodata;
     private TextView mNofavorite;
-    private TextView mFavoriteTip;
     private Button mRetry;
     private String category_chooser;
     public String jsonmovies;
@@ -90,6 +89,18 @@ public class PopMoviesFragment extends Fragment implements android.support.v4.ap
             MovieContract.MovieEntry.COLUMN_POSTER_IMAGE
     };
 
+    private static final String MOVIE_POPULAR = "popular";
+    private static final String MOVIE_TOP_RATED = "top_rated";
+    private static final String MOVIE_FAVORITE = "favorites";
+
+    private static final String posterSource = "posterImage";
+    private static final String backdropSource = "backdropImage";
+    private static final String mTitle = "title";
+    private static final String mPlotSynopsis = "plotSynopsis";
+    private static final String mVoteAvg = "voteAvg";
+    private static final String mReleaseDate = "releaseDate";
+    private static final String mId = "id";
+
     public PopMoviesFragment() {
 //        setRetainInstance( true );
     }
@@ -114,16 +125,17 @@ public class PopMoviesFragment extends Fragment implements android.support.v4.ap
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate( R.layout.fragment_main, container, false );
 
+        //Default Request: Popular Movies on Loading
             if (temp == null) {
-                category_chooser = "popular";
+                category_chooser = MOVIE_POPULAR;
             }
-            if (temp == "top_rated") {
+            if (temp == MOVIE_TOP_RATED) {
                 category_chooser = temp;
             }
-            if (temp == "popular") {
+            if (temp == MOVIE_POPULAR) {
                 category_chooser = temp;
             }
-            if (temp == "favorites"){
+            if (temp == MOVIE_FAVORITE){
                 category_chooser = temp;
             };
 
@@ -136,7 +148,7 @@ public class PopMoviesFragment extends Fragment implements android.support.v4.ap
             mNofavorite = (TextView) rootView.findViewById( R.id.no_favorite );
 
 
-        if(category_chooser == "popular" || category_chooser == "top_rated") {
+        if(category_chooser == MOVIE_POPULAR || category_chooser == MOVIE_TOP_RATED) {
 
             //Return background to default
             mRecyclerView.setBackgroundColor(0);
@@ -159,23 +171,22 @@ public class PopMoviesFragment extends Fragment implements android.support.v4.ap
                             public void onItemClick(View v, int position) {
                                 Log.d(TAG, "clicked position:" + position);
                                 Bundle bundle = new Bundle();
-                                bundle.putString( "id", moviesArrayList.get(position).mId );
-                                bundle.putString( "backdropImage", moviesArrayList.get( position ).backdropSource );
-                                bundle.putString( "posterImage", moviesArrayList.get( position ).posterSource );
-                                bundle.putString(  "title", moviesArrayList.get( position ).mTitle );
-                                bundle.putString( "plotSynopsis", moviesArrayList.get( position ).mPlotSynopsis );
-                                bundle.putString( "releaseDate", moviesArrayList.get( position ).mReleaseDate );
-                                bundle.putString( "voteAvg", moviesArrayList.get( position ).mVoteAvg );
+                                bundle.putString( mId, moviesArrayList.get(position).mId );
+                                bundle.putString( backdropSource, moviesArrayList.get( position ).backdropSource );
+                                bundle.putString( posterSource, moviesArrayList.get( position ).posterSource );
+                                bundle.putString( mTitle, moviesArrayList.get( position ).mTitle );
+                                bundle.putString( mPlotSynopsis, moviesArrayList.get( position ).mPlotSynopsis );
+                                bundle.putString( mReleaseDate, moviesArrayList.get( position ).mReleaseDate );
+                                bundle.putString( mVoteAvg, moviesArrayList.get( position ).mVoteAvg );
 
                                 //check if layout is more than 600 wide
-
                                 if(getActivity().findViewById( R.id.frag_details ) != null){
                                     mTwoPane = true;
                                 }else{
                                     mTwoPane = false;
                                 }
 
-
+                                //Apply a second fragment if screen is larger than 600dp
                                 if(mTwoPane) {
 
                                     PopMoviesDetailsFragment detailsFragment = new PopMoviesDetailsFragment();
@@ -209,6 +220,7 @@ public class PopMoviesFragment extends Fragment implements android.support.v4.ap
                     if(isInternetOn()){
 
                     }else{
+                        //if internet is off show retry screen
                         mRecyclerView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorWhite) );
                         mNodata.setVisibility( View.VISIBLE );
                         mRetry.setVisibility( View.VISIBLE );
@@ -227,7 +239,7 @@ public class PopMoviesFragment extends Fragment implements android.support.v4.ap
             });
 
 
-        }else if(category_chooser == "favorites"){
+        }else if(category_chooser == MOVIE_FAVORITE){
             MovieDbHelper movieDbHelper = new MovieDbHelper( mContext );
             mDb = movieDbHelper.getWritableDatabase();
             getLoaderManager().initLoader(ID_FAVORITES_LOADER, null, this);
